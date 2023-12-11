@@ -19,11 +19,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Console.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\..\RootsEngine_local\RootsEngine\Core.cpp" />
+    <ClCompile Include="..\..\RootsEngine_local\RootsEngine\Game.cpp" />
+    <ClCompile Include="..\..\RootsEngine_local\RootsEngine\InputSystem.cpp" />
+    <ClCompile Include="..\..\RootsEngine_local\RootsEngine\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\RootsEngine_local\RootsEngine\Core.hpp" />
+    <ClInclude Include="..\..\RootsEngine_local\RootsEngine\Game.hpp" />
+    <ClInclude Include="..\..\RootsEngine_local\RootsEngine\InputSystem.hpp" />
     <ClInclude Include="Console.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\RootsEngine_local\RootsEngine\EngineDesign.md" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
