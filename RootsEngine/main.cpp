@@ -84,6 +84,17 @@ constexpr int MIN_REGIONS = 1;
 constexpr int MAX_AREAS_IN_REGION = 15;
 constexpr int MIN_AREAS_IN_REGION = 3;
 
+enum CompassEnum {
+
+	North = 0,
+	South = 1,
+	East = 2,
+	West = 3,
+};
+
+ostream& operator <<(ostream& strm, CompassEnum compass);
+
+
 class Area {
 public:
 	Area();
@@ -101,6 +112,7 @@ private:
 	vector<Item> items;
 	vector<NPC> npcs;
 	Area* neighbors[4]; // N, S, E, W
+	friend ostream& operator<<(ostream&, const Area&);
 };
 
 class Region {
@@ -137,6 +149,19 @@ public:
 private:
 	World* world;
 };
+
+struct AreaLink {
+	Area* parent, * area;
+	CompassEnum parentDirection;
+
+	friend ostream& operator<<(ostream&, const AreaLink&);
+};
+
+AreaLink Dequeue(vector<AreaLink>&);
+
+AreaLink Pop(vector<AreaLink>&);
+
+AreaLink& LinkParentAndArea(AreaLink&, const size_t&);
 
 void PopulateArea(Area&);
 
@@ -307,6 +332,12 @@ string NPC::ToString() {
 
 #pragma region GameWorld Implementation
 
+ostream& operator <<(ostream& strm, CompassEnum compass) {
+	const string nameCompass[] = { "North", "South", "East", "West" };
+
+	return strm << nameCompass[compass];
+}
+
 #pragma region Area Implementation
 Area::Area() {
 	description = "This an Area.";
@@ -364,6 +395,25 @@ void Area::AddItem(const Item& _item) {
 }
 void Area::AddNPC(const NPC& _npc) {
 	this->npcs.push_back(_npc);
+}
+
+ostream& operator<<(ostream& out, const Area& _area) {
+	/*       [0]
+	*         ^
+	*         |
+	* [3] < - O - > [2]
+	*         |
+	*         v
+	*        [1]
+	*
+	*/
+	out << format("       {}       \n       ^\n       |\n{} < - {} - > {}\n       |\n       v\n       {}\n",
+		(_area.neighbors[0] != nullptr) ? _area.neighbors[0]->label : "None",
+		(_area.neighbors[3] != nullptr) ? _area.neighbors[3]->label : "None",
+		_area.label,
+		(_area.neighbors[2] != nullptr) ? _area.neighbors[2]->label : "None",
+		(_area.neighbors[1] != nullptr) ? _area.neighbors[1]->label : "None");
+	return out;
 }
 #pragma endregion
 
@@ -479,10 +529,11 @@ void GameWorld::PopulateGameWorld() {
 		// Populate the Area
 		PopulateArea(*_newArea);
 		// Add the area's neighbors to our vector
-		for (int j = 0; j < 4; j++) {
+		/*for (int j = 0; j < 4; j++) {
 			fringe.push_back(_newArea->GetNeighbor(j));
-		}
+		}*/
 	}
+
 	// Original world generation, no neighbors
 	/*size_t regionNum = rand() % (MAX_REGIONS - MIN_REGIONS) + MIN_REGIONS;
 	for (int i = 0; i < regionNum; i++) {
