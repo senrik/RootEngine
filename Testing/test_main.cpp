@@ -44,6 +44,7 @@ ostream& operator <<(ostream& out, const Area& _area) {
 		_area.number,
 		(_area.neighbors[2] != nullptr) ? _area.neighbors[2]->number : -1,
 		(_area.neighbors[1] != nullptr) ? _area.neighbors[1]->number : -1);
+	out << format("Position: ({}, {})\n", _area.posLat, _area.posLong);
 	return out;
 }
 
@@ -67,8 +68,8 @@ ostream& operator <<(ostream& out, const AreaLink& _link) {
 struct Region {
 	int number;
 	int areaCount;
-	Area* areas[REGION_AREA_NUM];
-	Area* root, northernBorder, southernBorder, easternBorder, westernBorder;
+	Area* areas[REGION_AREA_NUM], *northernExits[100], * southernExits[100], * eastExits[100], * westExits[100];
+	Area* root;
 
 	friend ostream& operator<<(ostream&, const Region&);
 };
@@ -190,6 +191,7 @@ int main(int argc, char* argv[]) {
 	test_region->root->number = 0;
 	test_region->root->posLat = 0;
 	test_region->root->posLong = 0;
+	test_region->areas[0] = test_region->root;
 	int areaCount = 1;
 	for (int i = 0; i < 4; i++) {
 		AreaLink _temp;
@@ -236,6 +238,8 @@ int main(int argc, char* argv[]) {
 		// link parent to area and area to parent
 		_tempLink = LinkParentAndArea(_tempLink, areaCount);
 
+		test_region->areas[areaCount] = _tempLink.area;
+
 		// add new possible areas to the collection
 		frontier = AddAreaLinks(frontier, _tempLink);
 
@@ -253,6 +257,35 @@ int main(int argc, char* argv[]) {
 	*        [1]
 	*
 	*/
+#pragma region Test Random
+	cout << "Testing Random..." << endl;
+	bool oneRolled = false, twoRolled = false, threeRolled = false, zeroRolled = false;
+	int rollCount = 0;
+	while (!oneRolled || !twoRolled || !threeRolled || !zeroRolled) {
+		int roll = rand() % 4;
+		switch (roll) {
+		case 0:
+			zeroRolled = true;
+			cout << "Zero Rolled on roll: " << rollCount << endl;
+			break;
+		case 1:
+			oneRolled = true;
+			cout << "One Rolled on roll: " << rollCount << endl;
+			break;
+		case 2:
+			twoRolled = true;
+			cout << "Two Rolled on roll: " << rollCount << endl;
+			break;
+		case 3:
+			threeRolled = true;
+			cout << "Three Rolled on roll: " << rollCount << endl;
+			break;
+		}
+		rollCount++;
+	}
+	cout << "Random Finished after " << rollCount << " rolls." << endl;
+#pragma endregion
+
 
 #pragma region Map Traversal
 	/*
@@ -307,21 +340,28 @@ int main(int argc, char* argv[]) {
 AreaLink& LinkParentAndArea(AreaLink& link, const size_t& areaCount) {
 	link.area = new Area();
 	link.area->number = areaCount;
+	link.area->posLat = link.parent->posLat;
+	link.area->posLong = link.parent->posLong;
 	// link area to parent
+
 	link.area->neighbors[link.parentDirection] = link.parent;
-	// link parent 
+	// link parent and set position
 	switch (link.parentDirection) {
 	case CompassEnum::North:
 		link.parent->neighbors[CompassEnum::South] = link.area;
+		link.area->posLong--;
 		break;
 	case CompassEnum::South:
 		link.parent->neighbors[CompassEnum::North] = link.area;
+		link.area->posLong++;
 		break;
 	case CompassEnum::East:
 		link.parent->neighbors[CompassEnum::West] = link.area;
+		link.area->posLat--;
 		break;
 	case CompassEnum::West:
 		link.parent->neighbors[CompassEnum::East] = link.area;
+		link.area->posLat++;
 		break;
 	}
 
