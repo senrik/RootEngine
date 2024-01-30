@@ -7,6 +7,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RootsEngine", "RootsEngine\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Testing", "Testing\Testing.vcxproj", "{50FC650E-BEA7-42FE-A0B1-CDFD5F9ADD71}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9226FC87-BAE8-4381-A624-CE96448B32DB}"
+	ProjectSection(SolutionItems) = preProject
+		RootsEngine\EngineDesign.md = RootsEngine\EngineDesign.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
