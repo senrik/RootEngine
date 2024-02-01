@@ -33,6 +33,8 @@ int main(int argc, char* argv[]) {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 #pragma endregion
 
+	unsigned int VBO; // specifying the buffer id
+	glGenBuffers(1, &VBO); // generating one buffer, using VBO to 
 	while (!glfwWindowShouldClose(window)) {
 
 		processInput(window);
