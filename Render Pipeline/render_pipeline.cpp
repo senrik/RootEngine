@@ -1,12 +1,15 @@
 #include <stdio.h>
+#include <math.h>
 #include <glad/glad.h> //manages function pointers for OpenGL
 #include <GLFW/glfw3.h> // Abstraction layer for targeting multiple systems with OpenGL
+#include "shader.hpp"
+
 
 #pragma region Callback functions Prototypes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 #pragma endregion
 
-void processInput(GLFWwindow* window);
+void processInput(GLFWwindow* window, float deltaTime);
 
 int main(int argc, char* argv[]) {
 
@@ -33,18 +36,84 @@ int main(int argc, char* argv[]) {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 #pragma endregion
 
-	unsigned int VBO; // specifying the buffer id
-	glGenBuffers(1, &VBO); // generating one buffer, using VBO to 
+	float vertices[] = {
+        // positions         // colors
+         -0.5f, 0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // bottom right
+         0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
+         0.0f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // top 
+
+    };
+	unsigned int indicies[] = {
+		0,1,3,
+		1,2,3
+	};
+
+#pragma region Shader Program Creation
+	Shader ourShader("shader.vs", "shader.fs");
+#pragma endregion
+
+	unsigned int VAO, VBO, EBO;
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO); // generating one buffer, using VBO's address as the id
+	//glGenBuffers(1, &EBO); // generating one buffer, using VBO's address as the id
+	glBindVertexArray(VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO); // binding the GL_ARRAY_BUFFER to VBO, action affecting the GL_ARRAY_BUFFER will affect VBO
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	/*glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);*/
+
+	// position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// color attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3*sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0); // unbinds VBO since it is now being tracked via the glVertexAttribPointer call
+
+	//glBindVertexArray(0);
+	// rainbow vertex color shader
+	ourShader.use();
+
+	float deltaTime = 0;
 	while (!glfwWindowShouldClose(window)) {
+		float timeValue = glfwGetTime();
+		deltaTime = timeValue - deltaTime;
+		// INPUT
+		processInput(window, deltaTime);
 
-		processInput(window);
 
+		// RENDER CALLS
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		//ourShader.setFloat("xOffset", sin(timeValue) / 10.0f);
+		//ourShader.setFloat("yOffset", cos(timeValue) / 10.0f);
+
+		
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		
+
+
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
+		deltaTime = timeValue;
 	}
 
+	// clean up
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
+	ourShader.terminateShader();
 	glfwTerminate();
 	return 0;
 }
@@ -55,7 +124,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 }
 #pragma endregion
 
-void processInput(GLFWwindow* window) {
+void processInput(GLFWwindow* window, float deltaTime) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
