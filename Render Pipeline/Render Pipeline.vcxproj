@@ -136,12 +136,16 @@
     <ClCompile Include="render_pipeline.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shader.hpp" />
+    <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="third party\src\glad.c" />
     <ClCompile Include="third party\src\ufbx.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shader.fs" />
     <None Include="shader.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
