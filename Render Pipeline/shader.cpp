@@ -1,4 +1,4 @@
-#include "shader.hpp"
+/*#include "shader.hpp"
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath) {
 	std::string vertexCode;
@@ -87,4 +87,4 @@ void Shader::setMat4(const std::string& name, glm::mat4 value) const {
 
 void Shader::terminateShader() {
 	glDeleteProgram(ID);
-}
+}*/

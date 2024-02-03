@@ -41,6 +41,7 @@ int main(int argc, char* argv[]) {
 		printf("Failed to initialize GLAD.\n");
 		return -1;
 	}
+	glEnable(GL_DEPTH_TEST);
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 #pragma endregion
@@ -108,6 +109,19 @@ int main(int argc, char* argv[]) {
 		6,5,4, // sixth triangle (b)
 		3,2,7, // seventh triangle (l)
 		2,6,7  // eigth triangle (l)
+	};
+
+	glm::vec3 cubePositions[] = {
+	glm::vec3(0.0f,  0.0f,  0.0f),
+	glm::vec3(2.0f,  5.0f, -15.0f),
+	glm::vec3(-1.5f, -2.2f, -2.5f),
+	glm::vec3(-3.8f, -2.0f, -12.3f),
+	glm::vec3(2.4f, -0.4f, -3.5f),
+	glm::vec3(-1.7f,  3.0f, -7.5f),
+	glm::vec3(1.3f, -2.0f, -2.5f),
+	glm::vec3(1.5f,  2.0f, -2.5f),
+	glm::vec3(1.5f,  0.2f, -1.5f),
+	glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 
 #pragma region Shader Program Creation
@@ -190,7 +204,7 @@ int main(int argc, char* argv[]) {
 
 		// RENDER CALLS
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// bind textures
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
@@ -199,33 +213,35 @@ int main(int argc, char* argv[]) {
 		ourShader.use();
 
 
-		glm::mat4 model = glm::mat4(1.0f);
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 proj = glm::mat4(1.0f);
 
-		// update coordinate matricies
-		// rotate model
-		model = glm::rotate(model, glm::radians(50.0f) * timeValue, glm::vec3(0.5f, 1.0f, 0.0f));
 		// set the camera space
 		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 		// set the perspective matrix
 		proj = glm::perspective(glm::radians(45.0f), (float)SCRN_WIDTH / (float)SCRN_HEIGHT, 0.01f, 1000.0f);
-
-		// get the "model" uniform and set it to the model matrix
-		unsigned int modelLoc = glGetUniformLocation(ourShader.ID, "model");
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		
 		// get the "view" uniform and set it to the view matrix
-		unsigned int viewLoc = glGetUniformLocation(ourShader.ID, "view");
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		ourShader.setMat4("view", view);
 		// get the "perspective" uniform and set it to the projection matrix
-		unsigned int projLoc = glGetUniformLocation(ourShader.ID, "projection");
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
+		ourShader.setMat4("projection", proj);
 
-		model = glm::rotate(model, glm::radians(50.0f) * deltaTime, glm::vec3(0.5f, 1.0f, 0.0f));
+		//model = glm::rotate(model, glm::radians(50.0f) * deltaTime, glm::vec3(0.5f, 1.0f, 0.0f));
 
 		// Draw the stuff
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		for (unsigned int i = 0; i < 10; i++) {
+			
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePositions[i]);
+			float angle= 30.0f * i;
+			model = glm::rotate(model, glm::radians(angle) *timeValue, glm::vec3(1.0f, 0.3f, 0.5f));
+			ourShader.setMat4("model", model);
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+		
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
