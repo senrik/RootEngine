@@ -35,10 +35,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader.vs">
+    <None Include="shader.vertshader">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="shader.fs">
+    <None Include="shader.fragshader">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
