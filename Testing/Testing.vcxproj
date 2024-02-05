@@ -135,6 +135,7 @@
     <ClInclude Include="GameWorld.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="..\Render Pipeline\diamond.txt" />
     <Text Include="CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

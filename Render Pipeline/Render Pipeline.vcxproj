@@ -147,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />
+    <Text Include="diamond.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="render_object.hpp" />

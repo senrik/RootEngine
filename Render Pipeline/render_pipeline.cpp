@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <vector>
 #include <glad/glad.h> //manages function pointers for OpenGL
 #include <GLFW/glfw3.h> // Abstraction layer for targeting multiple systems with OpenGL
 #include <glm/glm.hpp>
@@ -17,45 +18,38 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 void processInput(GLFWwindow* window, float deltaTime);
 
+// Render Pipeline boiler plate code
+int RenderPipeline_BP();
+
+// adds a renderable object to the queue to be draw.
+void RenderPipeline_Queue();
+
+
+
+
 #define SCRN_WIDTH 800
 #define SCRN_HEIGHT 600
+
+static GLFWwindow* window;
 
 int main(int argc, char* argv[]) {
   
 
 #pragma region Boiler Plate
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	GLFWwindow* window = glfwCreateWindow(SCRN_WIDTH, SCRN_HEIGHT, "Root Engine Render Pipeline", NULL, NULL);
-	if (window == NULL) {
-		printf("Failed to create GLFW window.\n");
-		glfwTerminate();
-		return -1;
-	}
-	glfwMakeContextCurrent(window);
-
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		printf("Failed to initialize GLAD.\n");
-		return -1;
-	}
-	glEnable(GL_DEPTH_TEST);
-
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	RenderPipeline_BP();
 #pragma endregion
 
+#pragma region Vert and Indicies
 	//float vertices[] = {
- //       // positions        // colors          // texture coords
- //       0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f, // front top right
-	//	0.5f, -0.5f,  0.5f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, // front bottom left
-	//   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, // front bottom left
-	//   -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f, // front top left
-	//    0.5f,  0.5f, -0.5f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f,
-	//	0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f,
-	//   -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
-	//   -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f,
+ //       // positions         // texture coords
+ //       0.5f,  0.5f,  0.5f,  0.0f, 0.0f, // front top right
+	//	  0.5f, -0.5f,  0.5f,  1.0f, 0.0f, // front bottom left
+	//   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // front bottom left
+	//   -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, // front top left
+	//    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	//	  0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+	//   -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	//   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
  //   };
 	float vertices[] = {
 	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -100,6 +94,42 @@ int main(int argc, char* argv[]) {
 	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
 	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
+
+	float diamondVerts[] = {
+		 // position			// texcoords
+		 0.0f,  0.5f,  0.0f,    0.0f,  1.0f,
+		-0.5f,  0.0f,  0.0f,    1.0f, -1.0f,
+		 0.0f,  0.0f, -0.5f,   -1.0f,  1.0f,
+
+		 0.0f, -0.5f,  0.0f,    0.0f, -1.0f,
+		-0.5f,  0.0f,  0.0f,    1.0f, -1.0f,
+		 0.0f,  0.0f, -0.5f,   -1.0f,  1.0f,
+
+		 0.0f,  0.5f,  0.0f,    0.0f,  1.0f,
+		 0.5f,  0.0f,  0.0f,    1.0f, -1.0f,
+		 0.0f,  0.0f, -0.5f,   -1.0f,  1.0f,
+
+		 0.0f, -0.5f,  0.0f,    0.0f, -1.0f,
+		 0.5f,  0.0f,  0.0f,    1.0f, -1.0f,
+		 0.0f,  0.0f, -0.5f,   -1.0f,  1.0f,
+
+		 0.0f,  0.5f,  0.0f,    0.0f,  1.0f,
+		-0.5f,  0.0f,  0.0f,    1.0f, -1.0f,
+		 0.0f,  0.0f,  0.5f,   -1.0f, -1.0f,
+
+		 0.0f, -0.5f,  0.0f,    0.0f, -1.0f,
+		-0.5f,  0.0f,  0.0f,    1.0f, -1.0f,
+		 0.0f,  0.0f,  0.5f,   -1.0f, -1.0f,
+		
+		 0.0f,  0.5f,  0.0f,    0.0f,  1.0f,
+		 0.5f,  0.0f,  0.0f,    1.0f, -1.0f,
+		 0.0f,  0.0f,  0.5f,   -1.0f, -1.0f,
+
+		 0.0f, -0.5f,  0.0f,    0.0f, -1.0f,
+		 0.5f,  0.0f,  0.0f,    1.0f, -1.0f,
+		 0.0f,  0.0f,  0.5f,   -1.0f, -1.0f,
+	};
+
 	unsigned int indicies[] = {
 		0,1,3, // first triangle (f)
 		1,2,3, // second triangle (f)
@@ -123,13 +153,14 @@ int main(int argc, char* argv[]) {
 	glm::vec3(1.5f,  0.2f, -1.5f),
 	glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
+#pragma endregion
 
 #pragma region Shader Program Creation
 	//Shader ourShader("shader.vs", "shader.fs");
 	Shader ourShader("shader.vertshader","shader.fragshader");
 #pragma endregion
 
-	// buffer objects
+	// buffer objects - created outside of individual objects, or does each object have its own buffer objects?
 	unsigned int VAO, VBO, EBO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO); // generating one buffer, using VBO's address as the id
@@ -145,17 +176,13 @@ int main(int argc, char* argv[]) {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	// element buffer
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
-
-	// color attribute [attrib index], [number of values], [value type], [normalize data flag], [stride], [offset to first attribute in array]
-	/*glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3*sizeof(float)));
-	glEnableVertexAttribArray(1);*/
-
 	// texture attribute
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+
+	// element buffer
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // unbinds VBO since it is now being tracked via the glVertexAttribPointer call
 
@@ -175,9 +202,11 @@ int main(int argc, char* argv[]) {
 	/*float borderColor[] = { 1.0f,1.0f,0.0f,1.0f };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);*/
 
-	// Generate mipmaps
+	// load image data
 	int width, height, nrChannels;
 	unsigned char* data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+
+	// Generate mipmaps
 	if (data) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
@@ -265,6 +294,29 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 #pragma endregion
+
+int RenderPipeline_BP() {
+	glfwInit();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+	window = glfwCreateWindow(SCRN_WIDTH, SCRN_HEIGHT, "Root Engine Render Pipeline", NULL, NULL);
+	if (window == NULL) {
+		printf("Failed to create GLFW window.\n");
+		glfwTerminate();
+		return -1;
+	}
+	glfwMakeContextCurrent(window);
+
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		printf("Failed to initialize GLAD.\n");
+		return -1;
+	}
+	glEnable(GL_DEPTH_TEST);
+
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+}
 
 void processInput(GLFWwindow* window, float deltaTime) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
