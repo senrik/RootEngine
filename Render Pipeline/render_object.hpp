@@ -1,36 +1,47 @@
 #ifndef RENDER_OBJECT_H
 #define RENDER_OBJECT_H
-#include <vector>
-#include "shader.hpp"
-// RenderObject
-// - verticies
-// - reference to texture (if none, one will be provided)
-// - shader
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
-// classes used to render objects in OpenGL
-// every object at least has a array of verticies
-// has an associated shader
-// rendered object -- all are textured, use a debug texture to apply to the object if it doesn't have a texture
-// flags for how the verticies are arranged
+#include<string>
+#include<fstream>
+#include<sstream>
+#include<iostream>
 
-typedef enum FormatFlags {
-	VERTEX_POS = (1<<0), //0
-	VERTEX_COLOR = (1<<1), //2
-	TEX_COORD = (1<<2) //4
-} FormatFlags;
+class Shader {
+public:
+	Shader();
+	Shader(const char* vertexPath, const char* fragmentPath);
+	void use();
+	void setBool(const std::string& name, bool value) const;
+	void setInt(const std::string& name, int value) const;
+	void setFloat(const std::string& name, float value) const;
+	void setMat4(const std::string& name, glm::mat4 value) const;
+	void terminateShader();
+private:
+	unsigned int ID;
+};
+
 
 class RenderObj {
 public:
-	RenderObj();
-	void Draw();
-private:
-	std::vector<float> verts;
-	Shader objShader;
+	unsigned int VBO, VAO, texture;
+	float* verticies;
+	unsigned int vertSize;
+	unsigned int vertCount;
+	unsigned int* spans;
+	unsigned int spanCount;
+	unsigned int totalSpan;
+	int t_width, t_height, nrChannels;
 	unsigned char* textureData;
+	Shader objShader;
+	// world space coordinates
+	float xPos, yPos, zPos;
 };
 
-RenderObj::RenderObj() {
-	
-}
+void RenderObj_Draw(RenderObj*);
+void RenderObj_Init(RenderObj*);
+void RenderObj_Terminate(RenderObj*);
 
 #endif

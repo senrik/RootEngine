@@ -134,16 +134,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.hpp" />
+    <ClCompile Include="render_object.cpp" />
     <ClCompile Include="render_pipeline.cpp" />
-    <ClCompile Include="shader.cpp" />
-    <ClCompile Include="shader.hpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="third party\src\glad.c" />
     <ClCompile Include="third party\src\ufbx.c" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader.fragshader" />
-    <None Include="shader.vertshader" />
+    <None Include="f_shader.fragshader" />
+    <None Include="v_shader.vertshader" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />
