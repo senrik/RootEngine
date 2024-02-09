@@ -1,5 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stb_image.h>
+
+typedef struct ImageData {
+	int width, height, nrChannels;
+	const unsigned char* textureData;
+} ImgData;
+
+
 
 typedef struct RootsObj {
 	float* verts;
@@ -7,6 +15,9 @@ typedef struct RootsObj {
 	unsigned int* spans;
 	unsigned int span_count;
 	const char* v_shader, *f_shader;
+	ImgData textureData;
+	// position data is world-space
+	float xPos, yPos, zPos;
 	
 
 } RootsObj;
@@ -14,7 +25,7 @@ typedef struct RootsObj {
 // C:\Users\sswanson33\Documents\V22 Model\CV22 FBX\cv22_rig01_export06.fbx
 
 float diamondVerts[] = {
-	// position			// texcoords
+	// position			   // texcoords
 	0.0f,  0.5f,  0.0f,    0.0f,  1.0f, //  0,  1,  2,  3,  4,
    -0.5f,  0.0f,  0.0f,    1.0f, -1.0f, //  5,  6,  7,  8,  9,
 	0.0f,  0.0f, -0.5f,   -1.0f,  1.0f, // 10, 11, 12, 13, 14,
@@ -88,6 +99,15 @@ int main(int argc, char* argv[]) {
 		"void main() {\n"
 		"FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.2);\n"
 		"}\0";
+	diamond.xPos = 0.0f;
+	diamond.yPos = 0.0f;
+	diamond.zPos = 0.0f;
+	int width, height, nrChannels;
+	diamond.textureData.textureData = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+	diamond.textureData.width = width;
+	diamond.textureData.height = height;
+	diamond.textureData.nrChannels = nrChannels;
+
 	try{
 		// write binary
 		FILE* ptr_myFile;
@@ -124,6 +144,8 @@ int main(int argc, char* argv[]) {
 			}
 
 		}
+
+		printf("Texture Dimensions: %d x %d", diamond2.textureData.width, diamond2.textureData.height);
 	}
 	catch (...){
 
