@@ -1,25 +1,9 @@
-#ifndef SHADER_H
-#define SHADER_H
-#include <glad/glad.h>
-#include <glm/glm.hpp>
+#include "render_object.hpp"
 
-#include<string>
-#include<fstream>
-#include<sstream>
-#include<iostream>
-
-class Shader {
-public:
-	unsigned int ID;
-
-	Shader(const char* vertexPath, const char* fragmentPath);
-	void use();
-	void setBool(const std::string& name, bool value) const;
-	void setInt(const std::string& name, int value) const;
-	void setFloat(const std::string& name, float value) const;
-	void setMat4(const std::string& name, glm::mat4 value) const;
-	void terminateShader();
-};
+#pragma region Shader
+Shader::Shader() {
+	ID = -1;
+}
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath) {
 	std::string vertexCode;
@@ -44,7 +28,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
 		fragmentCode = fShaderStream.str();
 	}
 	catch (std::ifstream::failure e) {
-		printf("ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ\N");
+		printf("ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ\n");
 	}
 	const char* vShaderCode = vertexCode.c_str();
 	const char* fShaderCode = fragmentCode.c_str();
@@ -109,4 +93,56 @@ void Shader::setMat4(const std::string& name, glm::mat4 value) const {
 void Shader::terminateShader() {
 	glDeleteProgram(ID);
 }
-#endif
+
+#pragma endregion
+
+void RenderObj_Draw(RenderObj* _obj) {
+	_obj->objShader.use();
+	
+	glBindTexture(GL_TEXTURE_2D, _obj->texture);
+	glBindVertexArray(_obj->VAO);
+	glDrawArrays(GL_TRIANGLES, 0, _obj->vertCount/_obj->totalSpan);
+	glBindVertexArray(0);
+}
+
+void RenderObj_Init(RenderObj* _obj) {
+	glGenVertexArrays(1, &_obj->VAO);
+	glGenBuffers(1, &_obj->VBO);
+
+	glBindVertexArray(_obj->VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, _obj->VBO);
+
+	glBufferData(GL_ARRAY_BUFFER, _obj->vertSize, _obj->verticies, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, _obj->totalSpan * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, _obj->totalSpan * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	glGenTextures(1, &_obj->texture);
+	glBindTexture(GL_TEXTURE_2D, _obj->texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	if (_obj->textureData) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _obj->t_width, _obj->t_height, 0, GL_RGB, GL_UNSIGNED_BYTE, _obj->textureData);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else {
+		printf("Failed to load texture!\n");
+	}
+}
+
+void RenderObj_Terminate(RenderObj* _obj) {
+	free(_obj->verticies);
+	free(_obj->spans);
+	free(_obj->textureData);
+	_obj->objShader.terminateShader();
+	glDeleteBuffers(1, &_obj->VBO);
+	glDeleteBuffers(1, &_obj->VAO);
+}
