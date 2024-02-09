@@ -8,6 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "shader.hpp"
+#include "render_object.hpp"
 
 #include <stb_image.h> // image loader
 
@@ -21,15 +22,18 @@ void processInput(GLFWwindow* window, float deltaTime);
 // Render Pipeline boiler plate code
 int RenderPipeline_BP();
 
-// adds a renderable object to the queue to be draw.
-void RenderPipeline_Queue();
-
-
+// adds a renderable object to the render cache
+void RenderPipeline_Queue(const RenderObj&);
+// draw everything inf the render cache
+void RenderPipeLine_Draw();
 
 
 #define SCRN_WIDTH 800
 #define SCRN_HEIGHT 600
+#define RENDER_CACHE_SIZE 100
 
+static const RenderObj* renderCache[RENDER_CACHE_SIZE];
+static unsigned int endOfCache = 0;
 static GLFWwindow* window;
 
 int main(int argc, char* argv[]) {
@@ -322,4 +326,13 @@ void processInput(GLFWwindow* window, float deltaTime) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
+}
+
+void RenderPipeline_Queue(const RenderObj& obj) {
+	renderCache[endOfCache] = &obj;
+	endOfCache++;
+}
+
+void RenderPipeLine_Draw() {
+
 }

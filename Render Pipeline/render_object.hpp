@@ -13,24 +13,21 @@
 // rendered object -- all are textured, use a debug texture to apply to the object if it doesn't have a texture
 // flags for how the verticies are arranged
 
-typedef enum FormatFlags {
-	VERTEX_POS = (1<<0), //0
-	VERTEX_COLOR = (1<<1), //2
-	TEX_COORD = (1<<2) //4
-} FormatFlags;
+typedef struct ImageData {
+	int width, height, nrChannels;
+	const unsigned char* textureData;
+} ImgData;
 
-class RenderObj {
-public:
-	RenderObj();
-	void Draw();
-private:
-	std::vector<float> verts;
-	Shader objShader;
-	unsigned char* textureData;
-};
+typedef struct RenderObj {
+	float* verts;
+	unsigned int vert_count;
+	unsigned int* spans;
+	unsigned int span_count;
+	const char* v_shader, * f_shader;
+	ImgData textureData;
+	// position data is world-space
+	float xPos, yPos, zPos;
 
-RenderObj::RenderObj() {
-	
-}
+} RenderObj;
 
 #endif
