@@ -2,6 +2,7 @@
 #include <math.h>
 #include <vector>
 #include "render_object.hpp"
+#include "Camera.hpp"
 #include <glad/glad.h> //manages function pointers for OpenGL
 #include <GLFW/glfw3.h> // Abstraction layer for targeting multiple systems with OpenGL
 #include <glm/glm.hpp>
@@ -34,7 +35,7 @@ void RenderCache_Clear();
 static RenderObj* renderCache;
 static unsigned int cacheSize = 0;
 static GLFWwindow* window;
-
+float rotationSpeed = 30.0f;
 
 int main(int argc, char* argv[]) {
   
@@ -234,9 +235,10 @@ void RenderCache_Add(const RenderObj* _obj) {
 void RenderCache_Draw(glm::mat4 _view, glm::mat4 _proj, float _time) {
 	for (int i = 0;i < cacheSize; i++)
 	{
+		printf("%.1F\n", rotationSpeed);
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(renderCache[i].xPos, renderCache[i].yPos, renderCache[i].zPos));
-		model = glm::rotate(model, _time * glm::radians(30.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(rotationSpeed), glm::vec3(0.5f, 1.0f, 0.0f));
 		renderCache[i].objShader.setMat4("view", _view);
 		renderCache[i].objShader.setMat4("projection", _proj);
 		renderCache[i].objShader.setMat4("model", model);
@@ -256,4 +258,10 @@ void processInput(GLFWwindow* window, float deltaTime) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
+
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)	{
+		
+		
+	}
+
 }
