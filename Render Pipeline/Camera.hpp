@@ -3,12 +3,17 @@
 #include <glm/glm.hpp>
 
 class Camera {
+public:
 	Camera();
-	// pos -- vec3
-	// direction -- quaternion?
-	// target -- vec3
-	// right axis -- vec3
-	// up axis -- vec3
+	glm::vec3 position, target;
+	glm::vec3 GetDirection();
+	void SetDirection(const glm::vec3*);
+	glm::vec3 GetRightAxis();
+	glm::vec3 GetUpAxis();
+private:
+	glm::vec3 direction;// direction -- quaternion?
+	glm::vec3 rightAxis, upAxis;
+	float rotationSpeed;
 	// translate camera 
 	// - WASD based off of the orientation of the camera
 	// rotate camera -- use quaternions
@@ -17,6 +22,7 @@ class Camera {
 	// - store as a unit vector
 };
 
+void Camera_Update(Camera*);
+void OrbitCamera_Rotate(Camera*, const float[], const float);
+
 #endif // !CAMERA_H
-
-

@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Camera.hpp" />
     <ClCompile Include="render_object.cpp" />
     <ClCompile Include="render_pipeline.cpp" />
