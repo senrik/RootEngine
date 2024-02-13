@@ -27,7 +27,7 @@ int RenderPipeline_BP();
 void RenderCache_Add(const RenderObj*);
 void RenderCache_Draw(glm::mat4, glm::mat4,float);
 void RenderCache_Clear();
-
+void RenderCache_AddMesh(const char*, ufbx_load_opts*, ufbx_error*);
 #define SCRN_WIDTH 800
 #define SCRN_HEIGHT 600
 #define RENDER_CACHE_SIZE 200
@@ -45,56 +45,51 @@ int main(int argc, char* argv[]) {
 
 	renderCache = (RenderObj*)malloc(sizeof(RenderObj) * RENDER_CACHE_SIZE);
 #pragma region Cube
-	float vertices[] = {
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	float cubeVerts[] = {
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // 0 - bottom left
+		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f, // 1 - bottom right
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // 2 - top right
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // 3 - top left
 
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  1.0f, 1.0f, // 4 - bottom left
+		 0.5f, -0.5f,  0.5f,  0.0f, 1.0f, // 5 - bottom right
+		 0.5f,  0.5f,  0.5f,  0.0f, 0.0f, // 6 - top right
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // 7 - top left
 
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	};
+	unsigned int cubeIndices[] = {
+		3, 1, 0,
+		1, 2, 3,
 
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		7, 4, 5,
+		5, 6, 7,
 
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		7, 3, 2,
+		2, 6, 7,
 
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+		4, 0, 1,
+		1, 5, 4,
+
+		2, 1, 5,
+		5, 6, 2,
+
+		3, 0, 4,
+		4, 7, 3
+
 	};
 	RenderObj cube;
-	cube.vertCount = 180;
+	cube.vertCount = sizeof(cubeVerts)/sizeof(float);
+	cube.vertSize = sizeof(cubeVerts);
 	cube.verticies = (float*)malloc(sizeof(float) * cube.vertCount);
 	for (int i = 0; i < cube.vertCount; i++) {
-		cube.verticies[i] = vertices[i];
+		cube.verticies[i] = cubeVerts[i];
 	}
-	cube.vertSize = sizeof(vertices);
+	cube.indicesCount = sizeof(cubeIndices)/sizeof(unsigned int);
+	cube.indicesSize = sizeof(cubeIndices);
+	cube.indices = (unsigned int*)malloc(sizeof(unsigned int) * cube.indicesCount);
+	for (int i = 0; i < cube.indicesCount; i++) {
+		cube.indices[i] = cubeIndices[i];
+	}
 	cube.spanCount = 2;
 	cube.spans = (unsigned*)malloc((sizeof(unsigned int) * cube.spanCount));
 	cube.spans[0] = 3;
@@ -144,7 +139,7 @@ int main(int argc, char* argv[]) {
 		 0.0f,  0.0f,  0.5f,    1.0f,  0.0f,
 	};
 	RenderObj diamond;
-	diamond.vertCount = 120;
+	diamond.vertCount = sizeof(diamondVerts)/sizeof(float);
 	diamond.verticies = (float*)malloc(sizeof(float) * diamond.vertCount);
 	for (int i = 0; i < diamond.vertCount; i++) {
 		diamond.verticies[i] = diamondVerts[i];
@@ -164,6 +159,13 @@ int main(int argc, char* argv[]) {
 	RenderObj_Init(&diamond);
 #pragma endregion
 	RenderCache_Add(&diamond);
+	
+#pragma region V22
+	ufbx_load_opts opts = { 0 };
+	ufbx_error fbx_error;
+	RenderCache_AddMesh("cv22_rig01_export07.fbx", &opts, &fbx_error);
+#pragma endregion
+	
 	float deltaTime = 0;
 	while (!glfwWindowShouldClose(window)) {
 		float timeValue = (float)glfwGetTime();
@@ -231,6 +233,29 @@ int RenderPipeline_BP() {
 void RenderCache_Add(const RenderObj* _obj) {
 	renderCache[cacheSize] = *_obj;
 	cacheSize++;
+}
+void RenderCache_AddMesh(const char* _scene, ufbx_load_opts* opts, ufbx_error* fbx_error) {
+	auto scene = ufbx_load_file(_scene, opts, fbx_error);
+	if (!scene) {
+		fprintf(stderr, "Failed to load: %s\n", fbx_error->description.data);
+		exit(1);
+	}
+	// decipher the fbx object to get verticies and animations
+	for (int i = 0; i < scene->nodes.count; i++) {
+		auto node = scene->nodes.data[i];
+		if (node->is_root) continue;
+		// Create a RenderObj
+		if (node->mesh) {
+			RenderObj _mesh;
+			// node->mesh->vertex_position  gets a vec3 for position, we are going to transform it into
+			printf("Mesh %s has %d verts\n", node->element.name.data, node->mesh->num_vertices);
+			printf("Mesh %s has %d indicies\n", node->element.name.data, node->mesh->num_indices);
+			printf(" - First vert position: (%.2F, %.2F, %.2F)\n", node->mesh->vertex_position[0].x, node->mesh->vertex_position[0].y, node->mesh->vertex_position[0].z);
+			printf(" - First vert UV Coord: (%.2F, %.2F)\n", node->mesh->vertex_uv[0].x, node->mesh->vertex_uv[0].y);
+			
+			
+		}
+	}
 }
 void RenderCache_Draw(glm::mat4 _view, glm::mat4 _proj, float _time) {
 	for (int i = 0;i < cacheSize; i++)

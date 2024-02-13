@@ -96,23 +96,22 @@ void Shader::terminateShader() {
 
 #pragma endregion
 
-void RenderObj_Draw(RenderObj* _obj) {
-	_obj->objShader.use();
-	
-	glBindTexture(GL_TEXTURE_2D, _obj->texture);
-	glBindVertexArray(_obj->VAO);
-	glDrawArrays(GL_TRIANGLES, 0, _obj->vertCount/_obj->totalSpan);
-	glBindVertexArray(0);
-}
 
 void RenderObj_Init(RenderObj* _obj) {
 	glGenVertexArrays(1, &_obj->VAO);
 	glGenBuffers(1, &_obj->VBO);
+	
 
 	glBindVertexArray(_obj->VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, _obj->VBO);
 
 	glBufferData(GL_ARRAY_BUFFER, _obj->vertSize, _obj->verticies, GL_STATIC_DRAW);
+
+	if (_obj->indicesCount > 0) {
+		glGenBuffers(1, &_obj->EBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _obj->EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, _obj->indicesSize, _obj->indices, GL_STATIC_DRAW);
+	}
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, _obj->totalSpan * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -136,6 +135,22 @@ void RenderObj_Init(RenderObj* _obj) {
 	else {
 		printf("Failed to load texture!\n");
 	}
+}
+
+
+void RenderObj_Draw(RenderObj* _obj) {
+	_obj->objShader.use();
+	
+	glBindTexture(GL_TEXTURE_2D, _obj->texture);
+	glBindVertexArray(_obj->VAO);
+	if (_obj->indicesCount > 0) {
+		glDrawElements(GL_TRIANGLES, _obj->indicesCount, GL_UNSIGNED_INT, 0);
+	}
+	else {
+		glDrawArrays(GL_TRIANGLES, 0, _obj->vertCount / _obj->totalSpan);
+	}
+	
+	glBindVertexArray(0);
 }
 
 void RenderObj_Terminate(RenderObj* _obj) {
