@@ -282,3 +282,12 @@ void processInput(GLFWwindow* window, float deltaTime) {
 		glfwSetWindowShouldClose(window, true);
 	}
 }
+
+void RenderPipeline_Queue(const RenderObj& obj) {
+	renderCache[endOfCache] = &obj;
+	endOfCache++;
+}
+
+void RenderPipeLine_Draw() {
+
+}

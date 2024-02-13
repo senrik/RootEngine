@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Render Pipeline\stb_image.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

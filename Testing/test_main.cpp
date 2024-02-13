@@ -1,14 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stb_image.h>
-#include "RenderObj.hpp"
 
 
 
 // C:\Users\sswanson33\Documents\V22 Model\CV22 FBX\cv22_rig01_export06.fbx
 
 float diamondVerts[] = {
-	// position			// texcoords
+	// position			   // texcoords
 	0.0f,  0.5f,  0.0f,    0.0f,  1.0f, //  0,  1,  2,  3,  4,
    -0.5f,  0.0f,  0.0f,    1.0f, -1.0f, //  5,  6,  7,  8,  9,
 	0.0f,  0.0f, -0.5f,   -1.0f,  1.0f, // 10, 11, 12, 13, 14,
