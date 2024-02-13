@@ -26,10 +26,13 @@ private:
 
 class RenderObj {
 public:
-	unsigned int VBO, VAO, texture;
+	unsigned int VBO, VAO, EBO, texture;
 	float* verticies;
 	unsigned int vertSize;
 	unsigned int vertCount;
+	unsigned int* indices;
+	unsigned int indicesSize;
+	unsigned int indicesCount;
 	unsigned int* spans;
 	unsigned int spanCount;
 	unsigned int totalSpan;
