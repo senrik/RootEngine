@@ -106,37 +106,24 @@ int main(int argc, char* argv[]) {
 #pragma region Diamond
 	float diamondVerts[] = {
 		 // position			// texcoords
-		 0.0f,  0.5f,  0.0f,    0.5f,  0.5f,
-		-0.5f,  0.0f,  0.0f,   -1.0f,  0.0f,
-		 0.0f,  0.0f, -0.5f,    1.0f,  0.0f,
-
-		 0.0f, -0.5f,  0.0f,    0.5f,  0.5f,
-		-0.5f,  0.0f,  0.0f,   -1.0f,  0.0f,
-		 0.0f,  0.0f, -0.5f,    1.0f,  0.0f,
-
-		 0.0f,  0.5f,  0.0f,    0.5f,  0.5f,
-		 0.5f,  0.0f,  0.0f,   -1.0f,  0.0f,
-		 0.0f,  0.0f, -0.5f,    1.0f,  0.0f,
-
-		 0.0f, -0.5f,  0.0f,    0.5f,  0.5f,
-		 0.5f,  0.0f,  0.0f,   -1.0f,  0.0f, 
-		 0.0f,  0.0f, -0.5f,    1.0f,  0.0f,
-
-		 0.0f,  0.5f,  0.0f,    0.5f,  0.5f,
-		-0.5f,  0.0f,  0.0f,   -1.0f,  0.0f,
-		 0.0f,  0.0f,  0.5f,    1.0f,  0.0f,
-
-		 0.0f, -0.5f,  0.0f,    0.5f,  0.5f,
-		-0.5f,  0.0f,  0.0f,   -1.0f,  0.0f,
-		 0.0f,  0.0f,  0.5f,    1.0f,  0.0f,
+		 0.0f,  0.5f,  0.0f,    0.5f,  0.5f, // 0 - top
+		-0.5f,  0.0f, -0.5f,    0.0f,  0.0f, // 1 - back left
+		 0.5f,  0.0f, -0.5f,    0.0f,  1.0f, // 2 - back right
+		-0.5f,  0.0f,  0.5f,    0.0f,  1.0f, // 3 - front left
+		 0.5f,  0.0f,  0.5f,    1.0f,  0.0f, // 4 - front right
+		 0.0f, -0.5f,  0.0f,    0.5f,  0.5f, // 5 - bottom
 		
-		 0.0f,  0.5f,  0.0f,    0.5f,  0.5f,
-		 0.5f,  0.0f,  0.0f,   -1.0f,  0.0f,
-		 0.0f,  0.0f,  0.5f,    1.0f,  0.0f,
+	};
+	unsigned int diamondIndices[] = {
+		0, 1, 2,
+		0, 2, 4,
+		0, 1, 3,
+		0, 3, 4,
+		5, 2, 1,
+		5, 4, 2,
+		5, 3, 1,
+		5, 4, 3,
 
-		 0.0f, -0.5f,  0.0f,    0.5f,  0.5f,
-		 0.5f,  0.0f,  0.0f,   -1.0f,  0.0f,
-		 0.0f,  0.0f,  0.5f,    1.0f,  0.0f,
 	};
 	RenderObj diamond;
 	diamond.vertCount = sizeof(diamondVerts)/sizeof(float);
@@ -145,6 +132,12 @@ int main(int argc, char* argv[]) {
 		diamond.verticies[i] = diamondVerts[i];
 	}
 	diamond.vertSize = sizeof(diamondVerts);
+	diamond.indicesCount = sizeof(diamondIndices) / sizeof(unsigned int);
+	diamond.indicesSize = sizeof(diamondIndices);
+	diamond.indices = (unsigned int*)malloc(sizeof(unsigned int) * diamond.indicesCount);
+	for (int i = 0; i < diamond.indicesCount; i++) {
+		diamond.indices[i] = diamondIndices[i];
+	}
 	diamond.spanCount = 2; // two different attributes to the verticies
 	diamond.spans = (unsigned int*)malloc((sizeof(unsigned int) * diamond.spanCount));
 	diamond.spans[0] = 3;
@@ -241,26 +234,67 @@ void RenderCache_AddMesh(const char* _scene, ufbx_load_opts* opts, ufbx_error* f
 		exit(1);
 	}
 	// decipher the fbx object to get verticies and animations
+	RenderObj _mesh;
+	unsigned int _totalVerts = 0;
+	unsigned int _totalIndices = 0;
 	for (int i = 0; i < scene->nodes.count; i++) {
 		auto node = scene->nodes.data[i];
 		if (node->is_root) continue;
 		// Create a RenderObj
 		if (node->mesh) {
-			RenderObj _mesh;
-			// node->mesh->vertex_position  gets a vec3 for position, we are going to transform it into
-			printf("Mesh %s has %d verts\n", node->element.name.data, node->mesh->num_vertices);
-			printf("Mesh %s has %d indicies\n", node->element.name.data, node->mesh->num_indices);
-			printf(" - First vert position: (%.2F, %.2F, %.2F)\n", node->mesh->vertex_position[0].x, node->mesh->vertex_position[0].y, node->mesh->vertex_position[0].z);
-			printf(" - First vert UV Coord: (%.2F, %.2F)\n", node->mesh->vertex_uv[0].x, node->mesh->vertex_uv[0].y);
-			
+			_totalVerts += node->mesh->num_vertices * (5);
+			_totalIndices += node->mesh->num_indices;		
 			
 		}
 	}
+	_mesh.vertCount = _totalVerts;
+	_mesh.verticies = (float*)malloc(sizeof(float) * _mesh.vertCount);
+	_mesh.vertSize = sizeof(_mesh.verticies)* _mesh.vertCount;
+	_mesh.indicesCount = _totalIndices;
+	_mesh.indices = (unsigned int*)malloc(sizeof(unsigned int) * _mesh.indicesCount);
+	_mesh.indicesSize = sizeof(_mesh.indices)* _mesh.indicesCount;
+	int currentVert = 0;
+	int currentIndex = 0;
+	for (int i = 0; i < scene->nodes.count; i++) {
+		auto node = scene->nodes.data[i];
+		if (node->is_root) continue;
+		// Create a RenderObj
+		if (node->mesh) {
+			// 
+			for (int j = 0;j < node->mesh->num_vertices; j++) {
+				// position values
+				_mesh.verticies[currentVert] = node->mesh->vertex_position[j].x;
+				_mesh.verticies[currentVert + 1] = node->mesh->vertex_position[j].y;
+				_mesh.verticies[currentVert + 2] = node->mesh->vertex_position[j].z;
+				// texture coords
+				_mesh.verticies[currentVert + 3] = node->mesh->vertex_uv[j].x;
+				_mesh.verticies[currentVert + 4] = node->mesh->vertex_uv[j].y;
+				currentVert += 5;
+			}
+
+			int _offset = currentIndex;
+			for (int j = 0; j < node->mesh->num_indices; j++) {
+				_mesh.indices[currentIndex] = node->mesh->vertex_indices.data[j]+ _offset;
+				currentIndex++;
+			}
+		}
+	}
+	_mesh.spanCount = 2;
+	_mesh.spans = (unsigned int*)malloc((sizeof(unsigned int) * _mesh.spanCount));
+	_mesh.spans[0] = 3;
+	_mesh.spans[1] = 2;
+	_mesh.totalSpan = 5;
+	_mesh.objShader = Shader("v_shader.vertshader", "f_shader.fragshader");
+	_mesh.textureData = stbi_load("CV22TS.jpg", &_mesh.t_width, &_mesh.t_height, &_mesh.nrChannels, 0);
+	_mesh.xPos = 0.0f;
+	_mesh.yPos = 0.0f;
+	_mesh.zPos = 0.0f;
+
 }
 void RenderCache_Draw(glm::mat4 _view, glm::mat4 _proj, float _time) {
 	for (int i = 0;i < cacheSize; i++)
 	{
-		printf("%.1F\n", rotationSpeed);
+		
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(renderCache[i].xPos, renderCache[i].yPos, renderCache[i].zPos));
 		model = glm::rotate(model, glm::radians(rotationSpeed), glm::vec3(0.5f, 1.0f, 0.0f));
