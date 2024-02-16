@@ -153,8 +153,25 @@ void RenderObj_Draw(RenderObj* _obj) {
 	glBindVertexArray(0);
 }
 
+void RenderObj_Rotate(RenderObj* _obj, const float _angle, const glm::vec3 _axis) {
+	// local rotation - to have global rotation, flip the rotation and euler angle values
+	_obj->rotation = _obj->rotation * glm::quat(_axis * _angle);
+}
+
+void RenderObj_Translate(RenderObj* _obj, const float _magnitude, const glm::vec3 _direction) {
+	
+	//ensure the direction is normalized
+	glm::vec3 _moveVec = _obj->rotation* (glm::normalize(_direction));
+	_moveVec = glm::normalize(_moveVec) * _magnitude;
+	_obj->xPos += _moveVec.x;
+	_obj->yPos += _moveVec.y;
+	_obj->zPos += _moveVec.z;
+
+}
+
 void RenderObj_Terminate(RenderObj* _obj) {
 	free(_obj->verticies);
+	if (_obj->indices != NULL) free(_obj->indices);
 	free(_obj->spans);
 	free(_obj->textureData);
 	_obj->objShader.terminateShader();
