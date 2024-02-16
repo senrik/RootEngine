@@ -6,6 +6,8 @@
 #include <glad/glad.h> //manages function pointers for OpenGL
 #include <GLFW/glfw3.h> // Abstraction layer for targeting multiple systems with OpenGL
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <ufbx.h>
@@ -25,6 +27,7 @@ void processInput(GLFWwindow* window, float deltaTime);
 int RenderPipeline_BP();
 
 void RenderCache_Add(const RenderObj*);
+void RenderCache_Add(const float* verts, unsigned int _vertCount, unsigned int* indices, unsigned int _indicesCount, const float _xPos, const float _yPos, const float _zPos);
 void RenderCache_Draw(glm::mat4, glm::mat4,float);
 void RenderCache_Clear();
 void RenderCache_AddMesh(const char*, ufbx_load_opts*, ufbx_error*);
@@ -33,6 +36,8 @@ void RenderCache_AddMesh(const char*, ufbx_load_opts*, ufbx_error*);
 #define RENDER_CACHE_SIZE 200
 
 static RenderObj* renderCache;
+static Camera* mainCamera;
+glm::highp_dvec2 cursorPos;
 static unsigned int cacheSize = 0;
 static GLFWwindow* window;
 float rotationSpeed = 30.0f;
@@ -100,65 +105,34 @@ int main(int argc, char* argv[]) {
 	cube.xPos = 1.0f;
 	cube.yPos = -0.5f;
 	cube.zPos = 0.0f;
+	
 	RenderObj_Init(&cube);
 #pragma endregion
 	RenderCache_Add(&cube);
 #pragma region Diamond
 	float diamondVerts[] = {
 		 // position			// texcoords
-		 0.0f,  0.5f,  0.0f,    0.5f,  0.5f,
-		-0.5f,  0.0f,  0.0f,   -1.0f,  0.0f,
-		 0.0f,  0.0f, -0.5f,    1.0f,  0.0f,
-
-		 0.0f, -0.5f,  0.0f,    0.5f,  0.5f,
-		-0.5f,  0.0f,  0.0f,   -1.0f,  0.0f,
-		 0.0f,  0.0f, -0.5f,    1.0f,  0.0f,
-
-		 0.0f,  0.5f,  0.0f,    0.5f,  0.5f,
-		 0.5f,  0.0f,  0.0f,   -1.0f,  0.0f,
-		 0.0f,  0.0f, -0.5f,    1.0f,  0.0f,
-
-		 0.0f, -0.5f,  0.0f,    0.5f,  0.5f,
-		 0.5f,  0.0f,  0.0f,   -1.0f,  0.0f, 
-		 0.0f,  0.0f, -0.5f,    1.0f,  0.0f,
-
-		 0.0f,  0.5f,  0.0f,    0.5f,  0.5f,
-		-0.5f,  0.0f,  0.0f,   -1.0f,  0.0f,
-		 0.0f,  0.0f,  0.5f,    1.0f,  0.0f,
-
-		 0.0f, -0.5f,  0.0f,    0.5f,  0.5f,
-		-0.5f,  0.0f,  0.0f,   -1.0f,  0.0f,
-		 0.0f,  0.0f,  0.5f,    1.0f,  0.0f,
+		 0.0f,  0.5f,  0.0f,    0.5f,  0.5f, // top - 0
+		 0.5f,  0.0f,  0.5f,    1.0f,  0.0f, // right - 1
+		-0.5f,  0.0f,  0.5f,    0.0f,  0.0f, // left - 2
+		 0.5f,  0.0f, -0.5f,    0.0f,  0.0f, // right - 3
+		-0.5f,  0.0f, -0.5f,    1.0f,  0.0f, // left - 4
+		 0.0f, -0.5f,  0.0f,    0.5f,  0.5f, // bottom - 5
 		
-		 0.0f,  0.5f,  0.0f,    0.5f,  0.5f,
-		 0.5f,  0.0f,  0.0f,   -1.0f,  0.0f,
-		 0.0f,  0.0f,  0.5f,    1.0f,  0.0f,
-
-		 0.0f, -0.5f,  0.0f,    0.5f,  0.5f,
-		 0.5f,  0.0f,  0.0f,   -1.0f,  0.0f,
-		 0.0f,  0.0f,  0.5f,    1.0f,  0.0f,
 	};
-	RenderObj diamond;
-	diamond.vertCount = sizeof(diamondVerts)/sizeof(float);
-	diamond.verticies = (float*)malloc(sizeof(float) * diamond.vertCount);
-	for (int i = 0; i < diamond.vertCount; i++) {
-		diamond.verticies[i] = diamondVerts[i];
-	}
-	diamond.vertSize = sizeof(diamondVerts);
-	diamond.spanCount = 2; // two different attributes to the verticies
-	diamond.spans = (unsigned int*)malloc((sizeof(unsigned int) * diamond.spanCount));
-	diamond.spans[0] = 3;
-	diamond.spans[1] = 2;
-	diamond.totalSpan = 5;
-	diamond.objShader = Shader("v_shader.vertshader", "f_shader.fragshader");	
-	diamond.textureData = stbi_load("container.jpg", &diamond.t_width, &diamond.t_height, &diamond.nrChannels, 0);
-	diamond.xPos = -1.0f;
-	diamond.yPos = 0.5f;
-	diamond.zPos = 0.0f;
-
-	RenderObj_Init(&diamond);
+	unsigned int diamondindices[] = {
+		0, 1, 2,
+		5, 1, 2,
+		0, 1, 3,
+		5, 1, 3,
+		0, 3, 4,
+		5, 3, 4,
+		0, 2, 4,
+		5, 2, 4
+	};
+	RenderCache_Add(diamondVerts, 30, diamondindices, 24, 0, 0, 0);
 #pragma endregion
-	RenderCache_Add(&diamond);
+	
 	
 #pragma region V22
 	ufbx_load_opts opts = { 0 };
@@ -183,7 +157,7 @@ int main(int argc, char* argv[]) {
 		glm::mat4 proj = glm::mat4(1.0f);
 
 		// set the camera space
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		view = mainCamera->GetViewMatrix();
 		// set the perspective matrix
 		proj = glm::perspective(glm::radians(45.0f), (float)SCRN_WIDTH / (float)SCRN_HEIGHT, 0.01f, 1000.0f);
 
@@ -228,6 +202,43 @@ int RenderPipeline_BP() {
 	glEnable(GL_DEPTH_TEST);
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+	mainCamera = new Camera();
+}
+
+void RenderCache_Add(const float* verts, unsigned int _vertCount, unsigned int* indices, unsigned int _indicesCount, const float _xPos, const float _yPos, const float _zPos) {
+	RenderObj obj;
+	
+	obj.vertCount = _vertCount;
+	obj.vertSize = _vertCount * sizeof(float);
+	obj.verticies = (float*)malloc(_vertCount * sizeof(float));
+	for (int i = 0; i < obj.vertCount; i++) {
+		obj.verticies[i] = verts[i];
+	}
+
+	//optional for indices
+	if (_indicesCount > 0 && indices != NULL) {
+		obj.indicesCount = _indicesCount;
+		obj.indicesSize = _indicesCount*sizeof(unsigned int);
+		obj.indices = (unsigned int*)malloc(sizeof(unsigned int) * obj.indicesCount);
+		for (int i = 0; i < obj.indicesCount; i++) {
+			obj.indices[i] = indices[i];
+		}
+	}
+	obj.spanCount = 2; // two different attributes to the verticies
+	obj.spans = (unsigned int*)malloc((sizeof(unsigned int) * obj.spanCount));
+	obj.spans[0] = 3; // position
+	obj.spans[1] = 2; // texture coords
+	obj.totalSpan = 5;
+	obj.objShader = Shader("v_shader.vertshader", "f_shader.fragshader");
+	obj.textureData = stbi_load("container.jpg", &obj.t_width, &obj.t_height, &obj.nrChannels, 0);
+	obj.xPos = _xPos;
+	obj.yPos = _yPos;
+	obj.zPos = _zPos;
+	//obj.rotation = glm::quat(glm::vec3(0.0f,0.0f,0.0f));
+
+	RenderObj_Init(&obj);
+	RenderCache_Add(&obj);
 }
 
 void RenderCache_Add(const RenderObj* _obj) {
@@ -247,26 +258,26 @@ void RenderCache_AddMesh(const char* _scene, ufbx_load_opts* opts, ufbx_error* f
 		// Create a RenderObj
 		if (node->mesh) {
 			RenderObj _mesh;
-			// node->mesh->vertex_position  gets a vec3 for position, we are going to transform it into
-			printf("Mesh %s has %d verts\n", node->element.name.data, node->mesh->num_vertices);
-			printf("Mesh %s has %d indicies\n", node->element.name.data, node->mesh->num_indices);
-			printf(" - First vert position: (%.2F, %.2F, %.2F)\n", node->mesh->vertex_position[0].x, node->mesh->vertex_position[0].y, node->mesh->vertex_position[0].z);
-			printf(" - First vert UV Coord: (%.2F, %.2F)\n", node->mesh->vertex_uv[0].x, node->mesh->vertex_uv[0].y);
-			
-			
+			// create the collection of verts
+			for (int j = 0; j < node->mesh->num_vertices; j++) {
+
+			}
 		}
 	}
 }
 void RenderCache_Draw(glm::mat4 _view, glm::mat4 _proj, float _time) {
 	for (int i = 0;i < cacheSize; i++)
 	{
-		printf("%.1F\n", rotationSpeed);
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(renderCache[i].xPos, renderCache[i].yPos, renderCache[i].zPos));
-		model = glm::rotate(model, glm::radians(rotationSpeed), glm::vec3(0.5f, 1.0f, 0.0f));
+		glm::mat4 modelTrans = glm::mat4(1.0f);
+		glm::mat4 modelRot = glm::mat4_cast(renderCache[i].rotation);
+		
+		
+		modelTrans = glm::translate(modelTrans, glm::vec3(renderCache[i].xPos, renderCache[i].yPos, renderCache[i].zPos));
+		
 		renderCache[i].objShader.setMat4("view", _view);
 		renderCache[i].objShader.setMat4("projection", _proj);
-		renderCache[i].objShader.setMat4("model", model);
+		renderCache[i].objShader.setMat4("modelTrans", modelTrans);
+		renderCache[i].objShader.setMat4("modelRot", modelRot);
 		RenderObj_Draw(&renderCache[i]);
 	}
 }
@@ -280,13 +291,89 @@ void RenderCache_Clear() {
 }
 
 void processInput(GLFWwindow* window, float deltaTime) {
+	glm::highp_dvec2 _currentCursorPos;
+	glfwGetCursorPos(window, &_currentCursorPos.x, &_currentCursorPos.y);
+	glm::highp_dvec2 _deltaCursorPos = _currentCursorPos - cursorPos;
+
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
+	// ================================== ROTATION ======================================
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+
+		
+		glm::vec3 _rotationVec = glm::vec3(0.0f);
+		// Rotate the render objs to the LEFT AND RIGHT
+		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+			_rotationVec.y = 1.0f;
+
+		}
+		else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+			_rotationVec.y = -1.0f;
+
+		}
+
+		// Rotate the render objs up and down
+		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+			_rotationVec.x = -1.0f;
+
+		}
+		else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+			_rotationVec.x = 1.0f;
+
+		}
+		Camera_Rotate(mainCamera, _rotationVec, deltaTime);
+	}
+
+	
+	//_deltaCursorPos = glm::normalize(_deltaCursorPos);
+	
+	if (glm::length(_deltaCursorPos) > 1) {
+		//printf("Current Position: (%.1F, %.1F)\n", _currentCursorPos.x, _currentCursorPos.y);
+		//printf("Prev Position: (%.1F, %.1F)\n", cursorPos.x, cursorPos.y);
+		//printf("Delta Position: (%.1F, %.1F)\n", _deltaCursorPos.x, _deltaCursorPos.y);
+		_deltaCursorPos = glm::normalize(_deltaCursorPos);
+		Camera_Rotate(mainCamera, glm::vec3(_deltaCursorPos, 1.0), deltaTime);
+		//printf("Normalized Delta Position: (%.1F, %.1F)\n", _deltaCursorPos.x, _deltaCursorPos.y);
+
+
+	}
+
+	// ================================== MOVEMENT ======================================
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS || 
+		glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS || 
+		glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || 
+		glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		glm::vec3 _movementVec = glm::vec3(0.0f);
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+			_movementVec.x = -1.0f;
+
+		}
+		else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+			_movementVec.x = 1.0f;
+
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+			_movementVec.z = -1.0f;
+
+		}
+		else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+			_movementVec.z = 1.0f;
+
+		}
+		
+	}
+
 
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)	{
 		
 		
 	}
 
+
+	cursorPos = _currentCursorPos;
 }
