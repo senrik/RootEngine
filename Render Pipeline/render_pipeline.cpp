@@ -335,8 +335,8 @@ void processInput(GLFWwindow* window, float deltaTime) {
 		//printf("Current Position: (%.1F, %.1F)\n", _currentCursorPos.x, _currentCursorPos.y);
 		//printf("Prev Position: (%.1F, %.1F)\n", cursorPos.x, cursorPos.y);
 		//printf("Delta Position: (%.1F, %.1F)\n", _deltaCursorPos.x, _deltaCursorPos.y);
-		_deltaCursorPos = glm::normalize(_deltaCursorPos);
-		Camera_Rotate(mainCamera, glm::vec3(_deltaCursorPos, 1.0), deltaTime);
+		//_deltaCursorPos = glm::normalize(_deltaCursorPos);
+		//Camera_Rotate(mainCamera, glm::vec3(_deltaCursorPos, 1.0), deltaTime);
 		//printf("Normalized Delta Position: (%.1F, %.1F)\n", _deltaCursorPos.x, _deltaCursorPos.y);
 
 
