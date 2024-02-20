@@ -6,6 +6,8 @@
 #include <glad/glad.h> //manages function pointers for OpenGL
 #include <GLFW/glfw3.h> // Abstraction layer for targeting multiple systems with OpenGL
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <ufbx.h>
@@ -35,6 +37,7 @@ void RenderCache_AddMesh(const char*, ufbx_load_opts*, ufbx_error*);
 static RenderObj* renderCache;
 static unsigned int cacheSize = 0;
 static GLFWwindow* window;
+static Camera* mainCamera;
 float rotationSpeed = 30.0f;
 
 int main(int argc, char* argv[]) {
@@ -221,6 +224,8 @@ int RenderPipeline_BP() {
 	glEnable(GL_DEPTH_TEST);
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+	mainCamera = (Camera*)malloc(sizeof(Camera));
 }
 
 void RenderCache_Add(const RenderObj* _obj) {
@@ -317,6 +322,13 @@ void processInput(GLFWwindow* window, float deltaTime) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
+	glm::vec3 _rotationVec;
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+
+		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 
 		}
 		else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
@@ -338,17 +350,6 @@ void processInput(GLFWwindow* window, float deltaTime) {
 
 	
 	//_deltaCursorPos = glm::normalize(_deltaCursorPos);
-	
-	if (glm::length(_deltaCursorPos) > 1) {
-		//printf("Current Position: (%.1F, %.1F)\n", _currentCursorPos.x, _currentCursorPos.y);
-		//printf("Prev Position: (%.1F, %.1F)\n", cursorPos.x, cursorPos.y);
-		//printf("Delta Position: (%.1F, %.1F)\n", _deltaCursorPos.x, _deltaCursorPos.y);
-		//_deltaCursorPos = glm::normalize(_deltaCursorPos);
-		//Camera_Rotate(mainCamera, glm::vec3(_deltaCursorPos, 1.0), deltaTime);
-		//printf("Normalized Delta Position: (%.1F, %.1F)\n", _deltaCursorPos.x, _deltaCursorPos.y);
-
-
-	}
 
 	// ================================== MOVEMENT ======================================
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS || 
