@@ -318,6 +318,65 @@ void processInput(GLFWwindow* window, float deltaTime) {
 		glfwSetWindowShouldClose(window, true);
 	}
 
+		}
+		else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+			_rotationVec.y = -1.0f;
+
+		}
+
+		// Rotate the render objs up and down
+		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+			_rotationVec.x = -1.0f;
+
+		}
+		else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+			_rotationVec.x = 1.0f;
+
+		}
+		Camera_Rotate(mainCamera, _rotationVec, deltaTime);
+	}
+
+	
+	//_deltaCursorPos = glm::normalize(_deltaCursorPos);
+	
+	if (glm::length(_deltaCursorPos) > 1) {
+		//printf("Current Position: (%.1F, %.1F)\n", _currentCursorPos.x, _currentCursorPos.y);
+		//printf("Prev Position: (%.1F, %.1F)\n", cursorPos.x, cursorPos.y);
+		//printf("Delta Position: (%.1F, %.1F)\n", _deltaCursorPos.x, _deltaCursorPos.y);
+		//_deltaCursorPos = glm::normalize(_deltaCursorPos);
+		//Camera_Rotate(mainCamera, glm::vec3(_deltaCursorPos, 1.0), deltaTime);
+		//printf("Normalized Delta Position: (%.1F, %.1F)\n", _deltaCursorPos.x, _deltaCursorPos.y);
+
+
+	}
+
+	// ================================== MOVEMENT ======================================
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS || 
+		glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS || 
+		glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || 
+		glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		glm::vec3 _movementVec = glm::vec3(0.0f);
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+			_movementVec.x = -1.0f;
+
+		}
+		else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+			_movementVec.x = 1.0f;
+
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+			_movementVec.z = -1.0f;
+
+		}
+		else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+			_movementVec.z = 1.0f;
+
+		}
+		
+	}
+
+
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)	{
 		
 		

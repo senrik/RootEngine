@@ -10,19 +10,22 @@ public:
 	void SetDirection(const glm::vec3*);
 	glm::vec3 GetRightAxis();
 	glm::vec3 GetUpAxis();
+	glm::mat4 GetViewMatrix();
+	void UpdateRotation(glm::quat);
+	void UpdatePosition(glm::vec3);
+	void SetRotation(glm::quat);
+	float GetRotationSpeed();
+	float GetTranslationSpeed();
 private:
-	glm::vec3 direction;// direction -- quaternion?
-	glm::vec3 rightAxis, upAxis;
-	float rotationSpeed;
-	// translate camera 
-	// - WASD based off of the orientation of the camera
-	// rotate camera -- use quaternions
-	// - capture the distance the mouse has traveled
-	// - rest mouse to center of the screen
-	// - store as a unit vector
+	glm::vec3 position, target;
+	glm::vec3 direction, rightAxis, upAxis;
+	glm::quat rotation;
+	float rotationSpeed, translationSpeed;
 };
 
-void Camera_Update(Camera*);
+void Camera_Rotate(Camera*, glm::vec3, const float);
+void Camera_ResetRotation(Camera*);
+void Camera_Translate(Camera*, glm::vec3, const float);
 void OrbitCamera_Rotate(Camera*, const float[], const float);
 
 #endif // !CAMERA_H
