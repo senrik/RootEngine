@@ -47,7 +47,6 @@ void Camera_Translate(Camera* _cam, glm::vec3 _axis, const float deltaTime) {
 	_cam->UpdatePosition(glm::normalize(_axis) * deltaTime * _cam->GetTranslationSpeed());
 }
 
-glm::mat4 Camera::GetViewMatrix() {
-	
-	// rotate the cmaera around its own right axis
+void Camera_Rotate(Camera*, glm::vec3, const float) {
+
 }
