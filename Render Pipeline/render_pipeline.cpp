@@ -321,35 +321,7 @@ void RenderCache_Clear() {
 void processInput(GLFWwindow* window, float deltaTime) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
-	}
-	glm::vec3 _rotationVec;
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ||
-		glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS ||
-		glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS ||
-		glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-
-		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-
-		}
-		else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-			_rotationVec.y = -1.0f;
-
-		}
-
-		// Rotate the render objs up and down
-		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-			_rotationVec.x = -1.0f;
-
-		}
-		else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-			_rotationVec.x = 1.0f;
-
-		}
-		Camera_Rotate(mainCamera, _rotationVec, deltaTime);
-	}
-
-	
-	//_deltaCursorPos = glm::normalize(_deltaCursorPos);
+	}	
 
 	// ================================== MOVEMENT ======================================
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS || 
@@ -374,12 +346,6 @@ void processInput(GLFWwindow* window, float deltaTime) {
 			_movementVec.z = 1.0f;
 
 		}
-		
-	}
-
-
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)	{
-		
 		
 	}
 

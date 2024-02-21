@@ -12,6 +12,11 @@ Camera::Camera() {
 
 glm::vec3 Camera::GetUpAxis() {
 	return upAxis;
+
+}
+
+float Camera::GetRotationSpeed() {
+	return rotationSpeed;
 }
 
 float Camera::GetTranslationSpeed() {
@@ -47,6 +52,6 @@ void Camera_Translate(Camera* _cam, glm::vec3 _axis, const float deltaTime) {
 	_cam->UpdatePosition(glm::normalize(_axis) * deltaTime * _cam->GetTranslationSpeed());
 }
 
-void Camera_Rotate(Camera*, glm::vec3, const float) {
-
+void Camera_Rotate(Camera* _cam, glm::vec3 _eulerVec, const float deltaTime) {
+	_cam->UpdateRotation(glm::quat(glm::normalize(_eulerVec) * _cam->GetRotationSpeed()));
 }
