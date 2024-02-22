@@ -42,6 +42,8 @@ public:
 	Shader objShader;
 	// world space coordinates
 	float xPos, yPos, zPos;
+	float xScale, yScale, zScale;
+	glm::quat rotation;
 };
 
 void RenderObj_Draw(RenderObj*);
