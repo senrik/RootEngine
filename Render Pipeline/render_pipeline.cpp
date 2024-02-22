@@ -192,7 +192,7 @@ int main(int argc, char* argv[]) {
 		deltaTime = timeValue;
 	}
 	RenderCache_Clear();
-
+	free(mainCamera);
 	glfwTerminate();
 	return 0;
 }
@@ -296,6 +296,7 @@ void RenderCache_AddMesh(const char* _scene, ufbx_load_opts* opts, ufbx_error* f
 	_mesh.zPos = 0.0f;
 
 }
+
 void RenderCache_Draw(glm::mat4 _view, glm::mat4 _proj, float _time) {
 	for (int i = 0;i < cacheSize; i++)
 	{
@@ -323,7 +324,7 @@ void processInput(GLFWwindow* window, float deltaTime) {
 		glfwSetWindowShouldClose(window, true);
 	}	
 
-	// ================================== MOVEMENT ======================================
+	// ================================== CAMERA MOVEMENT ======================================
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS || 
 		glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS || 
 		glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || 
@@ -346,7 +347,30 @@ void processInput(GLFWwindow* window, float deltaTime) {
 			_movementVec.z = 1.0f;
 
 		}
-		
 	}
+	// ================================== CAMERA ROTATION ======================================
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		
+		glm::vec3 _eulerRotation = glm::vec3(0.0f);
+		// rotation around the x-axis
+		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+			_eulerRotation.x = -1.0f;
+		}
+		else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+			_eulerRotation.x = 1.0f;
+		}
 
+		// rotationa round the y-axis
+		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+			_eulerRotation.y = -1.0f;
+		}
+		else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+			_eulerRotation.y = 1.0f;
+		}
+		printf("Euler Rotation: {%.1F, %.1F, %.1F}\n", _eulerRotation.x, _eulerRotation.y, _eulerRotation.z);
+		Camera_Rotate(mainCamera, _eulerRotation, deltaTime);
+	}
 }
