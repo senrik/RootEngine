@@ -26,7 +26,9 @@ void processInput(GLFWwindow* window, float deltaTime);
 // Render Pipeline boiler plate code
 int RenderPipeline_BP();
 
+void RenderCache_Init();
 void RenderCache_Add(const RenderObj*);
+void RenderCache_Add(const float* verts, unsigned int _vertCount, unsigned int* indices, unsigned int _indicesCount, const float _xPos, const float _yPos, const float _zPos);
 void RenderCache_Draw(glm::mat4, glm::mat4,float);
 void RenderCache_Clear();
 void RenderCache_AddMesh(const char*, ufbx_load_opts*, ufbx_error*);
@@ -47,6 +49,7 @@ int main(int argc, char* argv[]) {
 #pragma endregion
 
 	renderCache = (RenderObj*)malloc(sizeof(RenderObj) * RENDER_CACHE_SIZE);
+
 #pragma region Cube
 	float cubeVerts[] = {
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // 0 - bottom left
@@ -80,32 +83,11 @@ int main(int argc, char* argv[]) {
 		4, 7, 3
 
 	};
-	RenderObj cube;
-	cube.vertCount = sizeof(cubeVerts)/sizeof(float);
-	cube.vertSize = sizeof(cubeVerts);
-	cube.verticies = (float*)malloc(sizeof(float) * cube.vertCount);
-	for (int i = 0; i < cube.vertCount; i++) {
-		cube.verticies[i] = cubeVerts[i];
-	}
-	cube.indicesCount = sizeof(cubeIndices)/sizeof(unsigned int);
-	cube.indicesSize = sizeof(cubeIndices);
-	cube.indices = (unsigned int*)malloc(sizeof(unsigned int) * cube.indicesCount);
-	for (int i = 0; i < cube.indicesCount; i++) {
-		cube.indices[i] = cubeIndices[i];
-	}
-	cube.spanCount = 2;
-	cube.spans = (unsigned*)malloc((sizeof(unsigned int) * cube.spanCount));
-	cube.spans[0] = 3;
-	cube.spans[1] = 2;
-	cube.totalSpan = 5;
-	cube.objShader = Shader("v_shader.vertshader", "f_shader.fragshader");
-	cube.textureData = stbi_load("container.jpg", &cube.t_width, &cube.t_height, &cube.nrChannels, 0);
-	cube.xPos = 1.0f;
-	cube.yPos = -0.5f;
-	cube.zPos = 0.0f;
-	RenderObj_Init(&cube);
+
+	RenderCache_Add(cubeVerts, 40, cubeIndices, 36, 1.0f, -0.5f, 0.0f);
+	
 #pragma endregion
-	RenderCache_Add(&cube);
+	
 #pragma region Diamond
 	float diamondVerts[] = {
 		 // position			// texcoords
@@ -126,35 +108,11 @@ int main(int argc, char* argv[]) {
 		5, 4, 2,
 		5, 3, 1,
 		5, 4, 3,
-
 	};
-	RenderObj diamond;
-	diamond.vertCount = sizeof(diamondVerts)/sizeof(float);
-	diamond.verticies = (float*)malloc(sizeof(float) * diamond.vertCount);
-	for (int i = 0; i < diamond.vertCount; i++) {
-		diamond.verticies[i] = diamondVerts[i];
-	}
-	diamond.vertSize = sizeof(diamondVerts);
-	diamond.indicesCount = sizeof(diamondIndices) / sizeof(unsigned int);
-	diamond.indicesSize = sizeof(diamondIndices);
-	diamond.indices = (unsigned int*)malloc(sizeof(unsigned int) * diamond.indicesCount);
-	for (int i = 0; i < diamond.indicesCount; i++) {
-		diamond.indices[i] = diamondIndices[i];
-	}
-	diamond.spanCount = 2; // two different attributes to the verticies
-	diamond.spans = (unsigned int*)malloc((sizeof(unsigned int) * diamond.spanCount));
-	diamond.spans[0] = 3;
-	diamond.spans[1] = 2;
-	diamond.totalSpan = 5;
-	diamond.objShader = Shader("v_shader.vertshader", "f_shader.fragshader");	
-	diamond.textureData = stbi_load("container.jpg", &diamond.t_width, &diamond.t_height, &diamond.nrChannels, 0);
-	diamond.xPos = -1.0f;
-	diamond.yPos = 0.5f;
-	diamond.zPos = 0.0f;
 
-	RenderObj_Init(&diamond);
+	RenderCache_Add(diamondVerts, 30, diamondIndices, 24, -1.0f, 0.5f, 0.0f);
+	
 #pragma endregion
-	RenderCache_Add(&diamond);
 	
 #pragma region V22
 	ufbx_load_opts opts = { 0 };
@@ -162,6 +120,7 @@ int main(int argc, char* argv[]) {
 	RenderCache_AddMesh("cv22_rig01_export07.fbx", &opts, &fbx_error);
 #pragma endregion
 	
+	RenderCache_Init();
 	float deltaTime = 0;
 	while (!glfwWindowShouldClose(window)) {
 		float timeValue = (float)glfwGetTime();
@@ -173,14 +132,10 @@ int main(int argc, char* argv[]) {
 		// RENDER CALLS
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-
-		glm::mat4 view = glm::mat4(1.0f);
-		glm::mat4 proj = glm::mat4(1.0f);
 
 		// set the camera space
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-		// set the perspective matrix
+		glm::mat4 view = Camera_GetViewMatrix(mainCamera);
+		glm::mat4 proj = glm::mat4(1.0f);
 		proj = glm::perspective(glm::radians(45.0f), (float)SCRN_WIDTH / (float)SCRN_HEIGHT, 0.01f, 1000.0f);
 
 		RenderCache_Draw(view, proj, timeValue);
@@ -226,11 +181,53 @@ int RenderPipeline_BP() {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	mainCamera = (Camera*)malloc(sizeof(Camera));
+	Camera_Init(mainCamera);
+}
+
+
+void RenderCache_Init() {
+	for (int i = 0; i < cacheSize; i++) {
+		RenderObj_Init(&renderCache[i]);
+	}
 }
 
 void RenderCache_Add(const RenderObj* _obj) {
 	renderCache[cacheSize] = *_obj;
 	cacheSize++;
+}
+
+void RenderCache_Add(const float* verts, unsigned int _vertCount, unsigned int* indices, unsigned int _indicesCount, const float _xPos, const float _yPos, const float _zPos) {
+	RenderObj obj;
+
+	obj.spanCount = 2; // two different attributes to the verticies
+	obj.spans = (unsigned int*)malloc((sizeof(unsigned int) * obj.spanCount));
+	obj.spans[0] = 3; // position
+	obj.spans[1] = 2; // texture coords
+	obj.totalSpan = 5;
+	obj.vertCount = _vertCount;
+	obj.vertSize = _vertCount * sizeof(float);
+	obj.verticies = (float*)malloc(_vertCount * sizeof(float));
+	for (int i = 0; i < obj.vertCount; i++) {
+		obj.verticies[i] = verts[i];
+	}
+
+	//optional for indices
+	if (_indicesCount > 0 && indices != NULL) {
+		obj.indicesCount = _indicesCount;
+		obj.indicesSize = _indicesCount * sizeof(unsigned int);
+		obj.indices = (unsigned int*)malloc(sizeof(unsigned int) * obj.indicesCount);
+		for (int i = 0; i < obj.indicesCount; i++) {
+			obj.indices[i] = indices[i];
+		}
+	}
+	obj.objShader = Shader("v_shader.vertshader", "f_shader.fragshader");
+	obj.textureData = stbi_load("container.jpg", &obj.t_width, &obj.t_height, &obj.nrChannels, 0);
+	obj.xPos = _xPos;
+	obj.yPos = _yPos;
+	obj.zPos = _zPos;
+	obj.rotation = glm::quat(glm::vec3(0.0f,0.0f,0.0f));
+
+	RenderCache_Add(&obj);
 }
 void RenderCache_AddMesh(const char* _scene, ufbx_load_opts* opts, ufbx_error* fbx_error) {
 	auto scene = ufbx_load_file(_scene, opts, fbx_error);
@@ -294,7 +291,7 @@ void RenderCache_AddMesh(const char* _scene, ufbx_load_opts* opts, ufbx_error* f
 	_mesh.xPos = 0.0f;
 	_mesh.yPos = 0.0f;
 	_mesh.zPos = 0.0f;
-
+	RenderCache_Add(&_mesh);
 }
 
 void RenderCache_Draw(glm::mat4 _view, glm::mat4 _proj, float _time) {
@@ -303,13 +300,14 @@ void RenderCache_Draw(glm::mat4 _view, glm::mat4 _proj, float _time) {
 		
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(renderCache[i].xPos, renderCache[i].yPos, renderCache[i].zPos));
-		model = glm::rotate(model, glm::radians(rotationSpeed), glm::vec3(0.5f, 1.0f, 0.0f));
+		
 		renderCache[i].objShader.setMat4("view", _view);
 		renderCache[i].objShader.setMat4("projection", _proj);
 		renderCache[i].objShader.setMat4("model", model);
 		RenderObj_Draw(&renderCache[i]);
 	}
 }
+
 void RenderCache_Clear() {
 	for (int i = 0; i < cacheSize; i++)
 	{
@@ -331,22 +329,24 @@ void processInput(GLFWwindow* window, float deltaTime) {
 		glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		glm::vec3 _movementVec = glm::vec3(0.0f);
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-			_movementVec.x = -1.0f;
+			_movementVec.x = 1.0f;
 
 		}
 		else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-			_movementVec.x = 1.0f;
+			_movementVec.x = -1.0f;
 
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-			_movementVec.z = -1.0f;
-
-		}
-		else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 			_movementVec.z = 1.0f;
 
 		}
+		else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+			_movementVec.z = -1.0f;
+
+		}
+
+		Camera_Translate(mainCamera, _movementVec, deltaTime);
 	}
 	// ================================== CAMERA ROTATION ======================================
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS ||
@@ -370,7 +370,11 @@ void processInput(GLFWwindow* window, float deltaTime) {
 		else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 			_eulerRotation.y = 1.0f;
 		}
-		printf("Euler Rotation: {%.1F, %.1F, %.1F}\n", _eulerRotation.x, _eulerRotation.y, _eulerRotation.z);
+		//printf("Euler Rotation: {%.1F, %.1F, %.1F}\n", _eulerRotation.x, _eulerRotation.y, _eulerRotation.z);
 		Camera_Rotate(mainCamera, _eulerRotation, deltaTime);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
+		Camera_ResetRotation(mainCamera);
 	}
 }
