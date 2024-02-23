@@ -30,7 +30,7 @@ public:
 	// buffer objects
 	unsigned int VBO, VAO, EBO, texture;
 	// collection of raw data for vertices
-	float* verticies;
+	float* vertices;
 	// size of the vertices collection, in bytes
 	unsigned int vertSize;
 	// number of data points in the raw data

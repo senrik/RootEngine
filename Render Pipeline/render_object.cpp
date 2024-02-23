@@ -105,7 +105,7 @@ void RenderObj_Init(RenderObj* _obj) {
 	glBindVertexArray(_obj->VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, _obj->VBO);
 
-	glBufferData(GL_ARRAY_BUFFER, _obj->vertSize, _obj->verticies, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, _obj->vertSize, _obj->vertices, GL_STATIC_DRAW);
 
 	if (_obj->indicesCount > 0) {
 		glGenBuffers(1, &_obj->EBO);
@@ -113,12 +113,18 @@ void RenderObj_Init(RenderObj* _obj) {
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, _obj->indicesSize, _obj->indices, GL_STATIC_DRAW);
 	}
 
-	// position values
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, _obj->totalSpan * sizeof(float), (void*)0);
+	// vertex position values
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, _obj->totalSpan * sizeof(float), (void*)0);
+	
 	// texture coords
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, _obj->totalSpan * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, _obj->totalSpan * sizeof(float), (void*)(3 * sizeof(float)));
+	
+	// vertex normal values
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, _obj->totalSpan * sizeof(float), (void*)(5 * sizeof(float)));
+	
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -155,7 +161,7 @@ void RenderObj_Draw(RenderObj* _obj) {
 }
 
 void RenderObj_Terminate(RenderObj* _obj) {
-	free(_obj->verticies);
+	free(_obj->vertices);
 	free(_obj->spans);
 	free(_obj->textureData);
 	_obj->objShader.terminateShader();

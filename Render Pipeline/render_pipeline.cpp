@@ -206,9 +206,9 @@ void RenderCache_Add(const float* verts, unsigned int _vertCount, unsigned int* 
 	obj.totalSpan = 5;
 	obj.vertCount = _vertCount;
 	obj.vertSize = _vertCount * sizeof(float);
-	obj.verticies = (float*)malloc(_vertCount * sizeof(float));
+	obj.vertices = (float*)malloc(_vertCount * sizeof(float));
 	for (int i = 0; i < obj.vertCount; i++) {
-		obj.verticies[i] = verts[i];
+		obj.vertices[i] = verts[i];
 	}
 
 	//optional for indices
@@ -237,55 +237,66 @@ void RenderCache_AddMesh(const char* _scene, ufbx_load_opts* opts, ufbx_error* f
 	}
 	// decipher the fbx object to get verticies and animations
 	RenderObj _mesh;
-	unsigned int _totalVerts = 0;
-	unsigned int _totalIndices = 0;
+	//unsigned int _totalVerts = 0;
+	//unsigned int _totalIndices = 0;
+	//for (int i = 0; i < scene->nodes.count; i++) {
+	//	auto node = scene->nodes.data[i];
+	//	if (node->is_root) continue;
+	//	// Create a RenderObj
+	//	if (node->mesh) {
+	//		_totalVerts += node->mesh->num_vertices * (5);
+	//		_totalIndices += node->mesh->num_indices;		
+	//		
+	//	}
+	//}
+	//_mesh.vertCount = _totalVerts;
+	//_mesh.verticies = (float*)malloc(sizeof(float) * _mesh.vertCount);
+	//_mesh.vertSize = sizeof(_mesh.verticies)* _mesh.vertCount;
+	//_mesh.indicesCount = _totalIndices;
+	//_mesh.indices = (unsigned int*)malloc(sizeof(unsigned int) * _mesh.indicesCount);
+	//_mesh.indicesSize = sizeof(_mesh.indices)* _mesh.indicesCount;
+	//int currentVert = 0;
+	//int currentIndex = 0;
 	for (int i = 0; i < scene->nodes.count; i++) {
 		auto node = scene->nodes.data[i];
 		if (node->is_root) continue;
 		// Create a RenderObj
-		if (node->mesh) {
-			_totalVerts += node->mesh->num_vertices * (5);
-			_totalIndices += node->mesh->num_indices;		
-			
-		}
-	}
-	_mesh.vertCount = _totalVerts;
-	_mesh.verticies = (float*)malloc(sizeof(float) * _mesh.vertCount);
-	_mesh.vertSize = sizeof(_mesh.verticies)* _mesh.vertCount;
-	_mesh.indicesCount = _totalIndices;
-	_mesh.indices = (unsigned int*)malloc(sizeof(unsigned int) * _mesh.indicesCount);
-	_mesh.indicesSize = sizeof(_mesh.indices)* _mesh.indicesCount;
-	int currentVert = 0;
-	int currentIndex = 0;
-	for (int i = 0; i < scene->nodes.count; i++) {
-		auto node = scene->nodes.data[i];
-		if (node->is_root) continue;
-		// Create a RenderObj
-		if (node->mesh) {
+		if (strcmp(node->element.name.data,"PILOT1") == 0 && node->mesh) {
+			_mesh.spanCount = 3;
+			_mesh.spans = (unsigned int*)malloc((sizeof(unsigned int) * _mesh.spanCount));
+			_mesh.spans[0] = 3; // positions
+			_mesh.spans[1] = 2; // text coord
+			_mesh.spans[2] = 3; // vert normals
+			_mesh.totalSpan = 8;
+			_mesh.vertCount = node->mesh->num_vertices * _mesh.totalSpan; // logical verts, we have 3 + 3 + 2 values to record
+			_mesh.vertSize = sizeof(float) * _mesh.vertCount;
+			_mesh.vertices = (float*)malloc(sizeof(unsigned int) * _mesh.vertCount);
+			_mesh.indicesCount = node->mesh->num_indices;
+			_mesh.indicesSize = sizeof(unsigned int) * (_mesh.indicesCount);
+			_mesh.indices = (unsigned int*)malloc(sizeof(unsigned int) * (_mesh.indicesCount));
 			// 
 			for (int j = 0;j < node->mesh->num_vertices; j++) {
+				
+				int rawIndex = _mesh.totalSpan * j;
 				// position values
-				_mesh.verticies[currentVert] = node->mesh->vertex_position[j].x;
-				_mesh.verticies[currentVert + 1] = node->mesh->vertex_position[j].y;
-				_mesh.verticies[currentVert + 2] = node->mesh->vertex_position[j].z;
+				_mesh.vertices[rawIndex] = node->mesh->vertex_position[j].x;
+				_mesh.vertices[rawIndex +1] = node->mesh->vertex_position[j].y;
+				_mesh.vertices[rawIndex +2] = node->mesh->vertex_position[j].z;
 				// texture coords
-				_mesh.verticies[currentVert + 3] = node->mesh->vertex_uv[j].x;
-				_mesh.verticies[currentVert + 4] = node->mesh->vertex_uv[j].y;
-				currentVert += 5;
+				_mesh.vertices[rawIndex +3] = node->mesh->vertex_uv[j].x;
+				_mesh.vertices[rawIndex +4] = node->mesh->vertex_uv[j].y;
+				// vertex normal values
+				_mesh.vertices[rawIndex +5] = node->mesh->vertex_normal[j].x;
+				_mesh.vertices[rawIndex +6] = node->mesh->vertex_normal[j].y;
+				_mesh.vertices[rawIndex +7] = node->mesh->vertex_normal[j].z;
+				
 			}
 
-			int _offset = currentIndex;
 			for (int j = 0; j < node->mesh->num_indices; j++) {
-				_mesh.indices[currentIndex] = node->mesh->vertex_indices.data[j]+ _offset;
-				currentIndex++;
+				_mesh.indices[j] = node->mesh->vertex_indices[j];
 			}
 		}
 	}
-	_mesh.spanCount = 2;
-	_mesh.spans = (unsigned int*)malloc((sizeof(unsigned int) * _mesh.spanCount));
-	_mesh.spans[0] = 3;
-	_mesh.spans[1] = 2;
-	_mesh.totalSpan = 5;
 	_mesh.objShader = Shader("v_shader.vertshader", "f_shader.fragshader");
 	_mesh.textureData = stbi_load("CV22TS.jpg", &_mesh.t_width, &_mesh.t_height, &_mesh.nrChannels, 0);
 	_mesh.xPos = 0.0f;
