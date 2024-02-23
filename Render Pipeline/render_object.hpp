@@ -27,21 +27,35 @@ private:
 
 class RenderObj {
 public:
+	// buffer objects
 	unsigned int VBO, VAO, EBO, texture;
+	// collection of raw data for vertices
 	float* verticies;
+	// size of the vertices collection, in bytes
 	unsigned int vertSize;
+	// number of data points in the raw data
 	unsigned int vertCount;
+	// collection of indices if an element buffer is used
 	unsigned int* indices;
+	// size of the indices collection, in bytes
 	unsigned int indicesSize;
+	// number of indices
 	unsigned int indicesCount;
+	// collections of spans
 	unsigned int* spans;
+	// number of spans
 	unsigned int spanCount;
+	// the summation of all the spans
 	unsigned int totalSpan;
+	// texture data points
 	int t_width, t_height, nrChannels;
+	// raw texture data
 	unsigned char* textureData;
+	// shader
 	Shader objShader;
 	// world space coordinates
 	float xPos, yPos, zPos;
+	// world scale values
 	float xScale, yScale, zScale;
 	glm::quat rotation;
 };

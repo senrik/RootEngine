@@ -113,9 +113,10 @@ void RenderObj_Init(RenderObj* _obj) {
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, _obj->indicesSize, _obj->indices, GL_STATIC_DRAW);
 	}
 
+	// position values
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, _obj->totalSpan * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-
+	// texture coords
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, _obj->totalSpan * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
