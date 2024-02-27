@@ -52,15 +52,15 @@ int main(int argc, char* argv[]) {
 
 #pragma region Cube
 	float cubeVerts[] = {
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // 0 - bottom left
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f, // 1 - bottom right
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // 2 - top right
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // 3 - top left
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,     0.0f, -1.0f,  0.0f, // 0 - bottom left
+		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,     0.0f, -1.0f,  0.0f, // 1 - bottom right
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,     0.0f,  1.0f,  0.0f, // 2 - top right
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,     0.0f,  1.0f,  0.0f, // 3 - top left
 
-		-0.5f, -0.5f,  0.5f,  1.0f, 1.0f, // 4 - bottom left
-		 0.5f, -0.5f,  0.5f,  0.0f, 1.0f, // 5 - bottom right
-		 0.5f,  0.5f,  0.5f,  0.0f, 0.0f, // 6 - top right
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // 7 - top left
+		-0.5f, -0.5f,  0.5f,  1.0f, 1.0f,     0.0f, -1.0f,  0.0f, // 4 - bottom left
+		 0.5f, -0.5f,  0.5f,  0.0f, 1.0f,     0.0f, -1.0f,  0.0f, // 5 - bottom right
+		 0.5f,  0.5f,  0.5f,  0.0f, 0.0f,     0.0f,  1.0f,  0.0f, // 6 - top right
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,     0.0f,  1.0f,  0.0f, // 7 - top left
 
 	};
 	unsigned int cubeIndices[] = {
@@ -84,19 +84,19 @@ int main(int argc, char* argv[]) {
 
 	};
 
-	RenderCache_Add(cubeVerts, 40, cubeIndices, 36, 1.0f, -0.5f, 0.0f);
+	//RenderCache_Add(cubeVerts, 40, cubeIndices, 36, 1.0f, -0.5f, 0.0f);
 	
 #pragma endregion
 	
 #pragma region Diamond
 	float diamondVerts[] = {
-		 // position			// texcoords
-		 0.0f,  0.5f,  0.0f,    0.5f,  0.5f, // 0 - top
-		-0.5f,  0.0f, -0.5f,    0.0f,  0.0f, // 1 - back left
-		 0.5f,  0.0f, -0.5f,    0.0f,  1.0f, // 2 - back right
-		-0.5f,  0.0f,  0.5f,    0.0f,  1.0f, // 3 - front left
-		 0.5f,  0.0f,  0.5f,    1.0f,  0.0f, // 4 - front right
-		 0.0f, -0.5f,  0.0f,    0.5f,  0.5f, // 5 - bottom
+		 // position			// texcoords     // normal
+		 0.0f,  0.5f,  0.0f,    0.5f,  0.5f,     0.0f,  1.0f,  0.0f,// 0 - top
+		-0.5f,  0.0f, -0.5f,    0.0f,  0.0f,     0.0f,  0.0f,  1.0f, // 1 - back left
+		 0.5f,  0.0f, -0.5f,    0.0f,  1.0f,     0.0f,  0.0f,  1.0f, // 2 - back right
+		-0.5f,  0.0f,  0.5f,    0.0f,  1.0f,     0.0f,  0.0f,  1.0f, // 3 - front left
+		 0.5f,  0.0f,  0.5f,    1.0f,  0.0f,     0.0f,  0.0f,  1.0f, // 4 - front right
+		 0.0f, -0.5f,  0.0f,    0.5f,  0.5f,     0.0f, -1.0f,  0.0f, // 5 - bottom
 		
 	};
 	unsigned int diamondIndices[] = {
@@ -109,15 +109,18 @@ int main(int argc, char* argv[]) {
 		5, 3, 1,
 		5, 4, 3,
 	};
+	
 
-	RenderCache_Add(diamondVerts, 30, diamondIndices, 24, -1.0f, 0.5f, 0.0f);
+	RenderCache_Add(diamondVerts, 48, diamondIndices, 24, -1.0f, 0.5f, 0.0f);
 	
 #pragma endregion
 	
 #pragma region V22
+	
 	ufbx_load_opts opts = { 0 };
 	ufbx_error fbx_error;
-	RenderCache_AddMesh("cv22_rig01_export07.fbx", &opts, &fbx_error);
+	
+	//RenderCache_AddMesh("cv22_rig01_export07.fbx", &opts, &fbx_error);
 #pragma endregion
 	
 	RenderCache_Init();
@@ -199,16 +202,17 @@ void RenderCache_Add(const RenderObj* _obj) {
 void RenderCache_Add(const float* verts, unsigned int _vertCount, unsigned int* indices, unsigned int _indicesCount, const float _xPos, const float _yPos, const float _zPos) {
 	RenderObj obj;
 
-	obj.spanCount = 2; // two different attributes to the verticies
+	obj.spanCount = 3; // three different attributes to the verticies
 	obj.spans = (unsigned int*)malloc((sizeof(unsigned int) * obj.spanCount));
 	obj.spans[0] = 3; // position
 	obj.spans[1] = 2; // texture coords
-	obj.totalSpan = 5;
-	obj.vertCount = _vertCount;
-	obj.vertSize = _vertCount * sizeof(float);
-	obj.vertices = (float*)malloc(_vertCount * sizeof(float));
-	for (int i = 0; i < obj.vertCount; i++) {
-		obj.vertices[i] = verts[i];
+	obj.spans[2] = 3; // normal
+	obj.totalSpan = 8;
+	obj.rawVertCount = _vertCount;
+	obj.rawVertSize = _vertCount * sizeof(float);
+	obj.rawVertices = (float*)malloc(_vertCount * sizeof(float));
+	for (int i = 0; i < obj.rawVertCount; i++) {
+		obj.rawVertices[i] = verts[i];
 	}
 
 	//optional for indices
@@ -229,6 +233,7 @@ void RenderCache_Add(const float* verts, unsigned int _vertCount, unsigned int* 
 
 	RenderCache_Add(&obj);
 }
+
 void RenderCache_AddMesh(const char* _scene, ufbx_load_opts* opts, ufbx_error* fbx_error) {
 	auto scene = ufbx_load_file(_scene, opts, fbx_error);
 	if (!scene) {
@@ -237,72 +242,43 @@ void RenderCache_AddMesh(const char* _scene, ufbx_load_opts* opts, ufbx_error* f
 	}
 	// decipher the fbx object to get verticies and animations
 	RenderObj _mesh;
-	//unsigned int _totalVerts = 0;
-	//unsigned int _totalIndices = 0;
-	//for (int i = 0; i < scene->nodes.count; i++) {
-	//	auto node = scene->nodes.data[i];
-	//	if (node->is_root) continue;
-	//	// Create a RenderObj
-	//	if (node->mesh) {
-	//		_totalVerts += node->mesh->num_vertices * (5);
-	//		_totalIndices += node->mesh->num_indices;		
-	//		
-	//	}
-	//}
-	//_mesh.vertCount = _totalVerts;
-	//_mesh.verticies = (float*)malloc(sizeof(float) * _mesh.vertCount);
-	//_mesh.vertSize = sizeof(_mesh.verticies)* _mesh.vertCount;
-	//_mesh.indicesCount = _totalIndices;
-	//_mesh.indices = (unsigned int*)malloc(sizeof(unsigned int) * _mesh.indicesCount);
-	//_mesh.indicesSize = sizeof(_mesh.indices)* _mesh.indicesCount;
-	//int currentVert = 0;
-	//int currentIndex = 0;
 	for (int i = 0; i < scene->nodes.count; i++) {
 		auto node = scene->nodes.data[i];
 		if (node->is_root) continue;
 		// Create a RenderObj
 		if (strcmp(node->element.name.data,"PILOT1") == 0 && node->mesh) {
-			_mesh.spanCount = 3;
-			_mesh.spans = (unsigned int*)malloc((sizeof(unsigned int) * _mesh.spanCount));
-			_mesh.spans[0] = 3; // positions
-			_mesh.spans[1] = 2; // text coord
-			_mesh.spans[2] = 3; // vert normals
-			_mesh.totalSpan = 8;
-			_mesh.vertCount = node->mesh->num_vertices * _mesh.totalSpan; // logical verts, we have 3 + 3 + 2 values to record
-			_mesh.vertSize = sizeof(float) * _mesh.vertCount;
-			_mesh.vertices = (float*)malloc(sizeof(unsigned int) * _mesh.vertCount);
-			_mesh.indicesCount = node->mesh->num_indices;
-			_mesh.indicesSize = sizeof(unsigned int) * (_mesh.indicesCount);
-			_mesh.indices = (unsigned int*)malloc(sizeof(unsigned int) * (_mesh.indicesCount));
-			// 
-			for (int j = 0;j < node->mesh->num_vertices; j++) {
-				
-				int rawIndex = _mesh.totalSpan * j;
-				// position values
-				_mesh.vertices[rawIndex] = node->mesh->vertex_position[j].x;
-				_mesh.vertices[rawIndex +1] = node->mesh->vertex_position[j].y;
-				_mesh.vertices[rawIndex +2] = node->mesh->vertex_position[j].z;
-				// texture coords
-				_mesh.vertices[rawIndex +3] = node->mesh->vertex_uv[j].x;
-				_mesh.vertices[rawIndex +4] = node->mesh->vertex_uv[j].y;
-				// vertex normal values
-				_mesh.vertices[rawIndex +5] = node->mesh->vertex_normal[j].x;
-				_mesh.vertices[rawIndex +6] = node->mesh->vertex_normal[j].y;
-				_mesh.vertices[rawIndex +7] = node->mesh->vertex_normal[j].z;
-				
-			}
+			auto pilotMesh = node->mesh;
+			// triangle based importing
 
-			for (int j = 0; j < node->mesh->num_indices; j++) {
-				_mesh.indices[j] = node->mesh->vertex_indices[j];
+			size_t num_tri_indices = pilotMesh->max_face_triangles * 3;
+			uint32_t* tri_indices = (uint32_t*)malloc(sizeof(uint32_t) * num_tri_indices);
+			Vertex* tri_vertices = (Vertex*)malloc(sizeof(Vertex) * num_tri_indices);
+			size_t* indices = (size_t*)malloc(sizeof(size_t) * pilotMesh->max_face_triangles * 3);
+			for (int j = 0; j < pilotMesh->num_faces; j++) {
+				ufbx_face face = pilotMesh->faces.data[j];
+				size_t num_tris = ufbx_triangulate_face(tri_indices, num_tri_indices, pilotMesh, face);
+
+
 			}
+			
+			
+
+			//_mesh.xPos = node->local_transform.translation.x;
+			//_mesh.yPos = node->local_transform.translation.y;
+			//_mesh.zPos = node->local_transform.translation.z;
+			_mesh.rotation.x = node->local_transform.rotation.x;
+			_mesh.rotation.y = node->local_transform.rotation.y;
+			_mesh.rotation.z = node->local_transform.rotation.z;
+			_mesh.rotation.w = node->local_transform.rotation.w;
 		}
 	}
-	_mesh.objShader = Shader("v_shader.vertshader", "f_shader.fragshader");
-	_mesh.textureData = stbi_load("CV22TS.jpg", &_mesh.t_width, &_mesh.t_height, &_mesh.nrChannels, 0);
+
 	_mesh.xPos = 0.0f;
 	_mesh.yPos = 0.0f;
 	_mesh.zPos = 0.0f;
-	RenderCache_Add(&_mesh);
+	_mesh.objShader = Shader("v_shader.vertshader", "f_shader.fragshader");
+	_mesh.textureData = stbi_load("CV22TS.jpg", &_mesh.t_width, &_mesh.t_height, &_mesh.nrChannels, 0);
+	//RenderCache_Add(&_mesh);
 }
 
 void RenderCache_Draw(glm::mat4 _view, glm::mat4 _proj, float _time) {
