@@ -96,7 +96,39 @@ void Shader::terminateShader() {
 
 #pragma endregion
 
+#pragma region Mesh
+void Mesh_Init(Mesh* _mesh, uint32_t _vertCount, uint32_t _indicesCount, const char* _textureName, uint32_t _textureCount) {
+	_mesh->vertCount = _vertCount;
+	_mesh->vertSize = sizeof(Vertex) * _vertCount;
+	_mesh->vertices = (Vertex*)malloc(_mesh->vertSize);
+	_mesh->indicesCount = _indicesCount;
+	_mesh->indicesSize = sizeof(Vertex) * _indicesCount;
+	_mesh->indices = (uint32_t*)malloc(_mesh->indicesSize);
+	_mesh->textureCount = _textureCount;
+	_mesh->textureSize = sizeof(Texture) * _textureCount;
+	_mesh->textures = (Texture*)malloc(_mesh->textureSize);
+}
+void Mesh_Draw(Mesh* _mesh) {
 
+}
+void Mesh_Terminate(Mesh* _mesh) {
+	free(_mesh->vertices);
+	free(_mesh->indices);
+	free(_mesh->textures);
+}
+#pragma endregion
+
+#pragma region Texture
+void Texture_Init(Texture* _texture, const char* _textureName) {
+	_texture->textureData = stbi_load(_textureName, &_texture->t_width, &_texture->t_height, &_texture->nrChannels, 0);
+}
+
+void Texture_Terminate(Texture* _texture) {
+	free(_texture->textureData);
+}
+#pragma endregion
+
+#pragma region RenderObj
 void RenderObj_Init(RenderObj* _obj) {
 	glGenVertexArrays(1, &_obj->VAO);
 	glGenBuffers(1, &_obj->VBO);
@@ -105,7 +137,7 @@ void RenderObj_Init(RenderObj* _obj) {
 	glBindVertexArray(_obj->VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, _obj->VBO);
 
-	glBufferData(GL_ARRAY_BUFFER, _obj->vertSize, _obj->vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, _obj->rawVertSize, _obj->rawVertices, GL_STATIC_DRAW);
 
 	if (_obj->indicesCount > 0) {
 		glGenBuffers(1, &_obj->EBO);
@@ -121,21 +153,23 @@ void RenderObj_Init(RenderObj* _obj) {
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, _obj->totalSpan * sizeof(float), (void*)(3 * sizeof(float)));
 	
-	// vertex normal values
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, _obj->totalSpan * sizeof(float), (void*)(5 * sizeof(float)));
-	
+	if (_obj->spanCount > 2) {
+		// vertex normal values
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, _obj->totalSpan * sizeof(float), (void*)(5 * sizeof(float)));
+	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	glGenTextures(1, &_obj->texture);
-	glBindTexture(GL_TEXTURE_2D, _obj->texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	if (_obj->textureData) {
+	if (_obj->textureData != NULL) {
+		glGenTextures(1, &_obj->texture);
+		glBindTexture(GL_TEXTURE_2D, _obj->texture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _obj->t_width, _obj->t_height, 0, GL_RGB, GL_UNSIGNED_BYTE, _obj->textureData);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
@@ -147,24 +181,28 @@ void RenderObj_Init(RenderObj* _obj) {
 
 void RenderObj_Draw(RenderObj* _obj) {
 	_obj->objShader.use();
-	
-	glBindTexture(GL_TEXTURE_2D, _obj->texture);
+	if (_obj->texture) {
+		glBindTexture(GL_TEXTURE_2D, _obj->texture);
+	}
 	glBindVertexArray(_obj->VAO);
 	if (_obj->indicesCount > 0) {
 		glDrawElements(GL_TRIANGLES, _obj->indicesCount, GL_UNSIGNED_INT, 0);
 	}
 	else {
-		glDrawArrays(GL_TRIANGLES, 0, _obj->vertCount / _obj->totalSpan);
+		glDrawArrays(GL_TRIANGLES, 0, _obj->rawVertCount / _obj->totalSpan);
 	}
 	
 	glBindVertexArray(0);
 }
 
 void RenderObj_Terminate(RenderObj* _obj) {
-	free(_obj->vertices);
+	free(_obj->rawVertices);
 	free(_obj->spans);
-	free(_obj->textureData);
+	if (_obj->textureData != NULL) {
+		free(_obj->textureData);
+	}
 	_obj->objShader.terminateShader();
 	glDeleteBuffers(1, &_obj->VBO);
 	glDeleteBuffers(1, &_obj->VAO);
 }
+#pragma endregion
