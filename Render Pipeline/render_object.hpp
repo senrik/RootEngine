@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <ufbx.h>
 #include <stb_image.h>
 #include<string>
 #include<fstream>
@@ -37,49 +38,34 @@ typedef struct Texture {
 } Texture;
 
 typedef struct Mesh {
+
+	uint32_t totalSpan;
+	// temporary buffer
 	Vertex* vertices;
-	unsigned int vertCount;
-	unsigned int vertSize;
-
-	unsigned int* indices;
-	unsigned int indicesCount;
-	unsigned int indicesSize;
-
+	uint32_t vertCount;
+	uint32_t vertSize;
+	// temporary buffer
+	uint32_t* indices;
+	uint32_t indicesCount;
+	uint32_t indicesSize;
+	// temporary buffer
 	Texture* textures;
-	unsigned int textureCount;
-	unsigned int textureSize;
+	uint32_t textureCount;
+	uint32_t textureSize;
+
+	uint32_t materialIndex;
+	unsigned int VBO, VAO, EBO, texture;
+
+	float* rawVertices;
+	size_t rawVertCount;
+	size_t rawVertSize;
 } Mesh;
 
 typedef struct RenderObj {
 public:
-	// buffer objects
-	unsigned int VBO, VAO, EBO, texture;
-	// collection of raw data for vertices
-	float* rawVertices;
-	// size of the vertices collection, in bytes
-	unsigned int rawVertSize;
-	// number of data points in the raw data
-	unsigned int rawVertCount;
-	//Vertex* vertices;
-	unsigned int vertCount;
-	// collection of indices if an element buffer is used
-	unsigned int* indices;
-	// size of the indices collection, in bytes
-	unsigned int indicesSize;
-	// number of indices
-	unsigned int indicesCount;
-	// collections of spans
-	unsigned int* spans;
-	// number of spans
-	unsigned int spanCount;
-	// the summation of all the spans
-	unsigned int totalSpan;
-	// mesh structs
-	Mesh mesh;
-	// texture data points
-	int t_width, t_height, nrChannels;
-	// raw texture data
-	unsigned char* textureData;
+
+	Mesh* objMeshes;
+	uint32_t meshesCount;
 	// shader
 	Shader objShader;
 	// world space coordinates
@@ -92,13 +78,17 @@ public:
 void Texture_Init(Texture*, const char*);
 void Texture_Terminate(Texture*);
 
-void Mesh_Init(Mesh*);
+void Mesh_Init(Mesh* _mesh);
 void Mesh_Draw(Mesh*);
+void Mesh_RawVertsInit(Mesh*);
 void Mesh_Terminate(Mesh*);
 
-void RenderObj_Draw(RenderObj*);
+void RenderObj_ReadFBX(RenderObj*, ufbx_scene*, const char*);
 void RenderObj_Init(RenderObj*);
+void RenderObj_Draw(RenderObj*);
 void RenderObj_Terminate(RenderObj*);
 
+glm::vec3 ufbx_to_glm_vec3(ufbx_vec3);
+glm::vec2 ufbx_to_glm_vec2(ufbx_vec2);
 
 #endif

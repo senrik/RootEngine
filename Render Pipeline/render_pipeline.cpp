@@ -52,15 +52,15 @@ int main(int argc, char* argv[]) {
 
 #pragma region Cube
 	float cubeVerts[] = {
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,     0.0f, -1.0f,  0.0f, // 0 - bottom left
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,     0.0f, -1.0f,  0.0f, // 1 - bottom right
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,     0.0f,  1.0f,  0.0f, // 2 - top right
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,     0.0f,  1.0f,  0.0f, // 3 - top left
+		-0.5f, -0.5f, -0.5f,     0.0f, 0.0f,     0.0f, -1.0f,  0.0f, // 0 - bottom left
+		 0.5f, -0.5f, -0.5f,     1.0f, 0.0f,     0.0f, -1.0f,  0.0f, // 1 - bottom right
+		 0.5f,  0.5f, -0.5f,     1.0f, 1.0f,     0.0f,  1.0f,  0.0f, // 2 - top right
+		-0.5f,  0.5f, -0.5f,     0.0f, 1.0f,     0.0f,  1.0f,  0.0f, // 3 - top left
 
-		-0.5f, -0.5f,  0.5f,  1.0f, 1.0f,     0.0f, -1.0f,  0.0f, // 4 - bottom left
-		 0.5f, -0.5f,  0.5f,  0.0f, 1.0f,     0.0f, -1.0f,  0.0f, // 5 - bottom right
-		 0.5f,  0.5f,  0.5f,  0.0f, 0.0f,     0.0f,  1.0f,  0.0f, // 6 - top right
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,     0.0f,  1.0f,  0.0f, // 7 - top left
+		-0.5f, -0.5f,  0.5f,     1.0f, 1.0f,     0.0f, -1.0f,  0.0f, // 4 - bottom left
+		 0.5f, -0.5f,  0.5f,     0.0f, 1.0f,     0.0f, -1.0f,  0.0f, // 5 - bottom right
+		 0.5f,  0.5f,  0.5f,     0.0f, 0.0f,     0.0f,  1.0f,  0.0f, // 6 - top right
+		-0.5f,  0.5f,  0.5f,     1.0f, 0.0f,     0.0f,  1.0f,  0.0f, // 7 - top left
 
 	};
 	unsigned int cubeIndices[] = {
@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
 
 	};
 
-	//RenderCache_Add(cubeVerts, 40, cubeIndices, 36, 1.0f, -0.5f, 0.0f);
+	//RenderCache_Add(cubeVerts, 40, cubeIndices, 36, 0.0f, -0.5f, 0.0f);
 	
 #pragma endregion
 	
@@ -111,7 +111,7 @@ int main(int argc, char* argv[]) {
 	};
 	
 
-	RenderCache_Add(diamondVerts, 48, diamondIndices, 24, -1.0f, 0.5f, 0.0f);
+	//RenderCache_Add(diamondVerts, 48, diamondIndices, 24, -1.0f, 0.5f, 0.0f);
 	
 #pragma endregion
 	
@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) {
 	ufbx_load_opts opts = { 0 };
 	ufbx_error fbx_error;
 	
-	//RenderCache_AddMesh("cv22_rig01_export07.fbx", &opts, &fbx_error);
+	RenderCache_AddMesh("cv22_rig01_export08.fbx", &opts, &fbx_error);
 #pragma endregion
 	
 	RenderCache_Init();
@@ -190,6 +190,7 @@ int RenderPipeline_BP() {
 
 void RenderCache_Init() {
 	for (int i = 0; i < cacheSize; i++) {
+
 		RenderObj_Init(&renderCache[i]);
 	}
 }
@@ -201,34 +202,54 @@ void RenderCache_Add(const RenderObj* _obj) {
 
 void RenderCache_Add(const float* verts, unsigned int _vertCount, unsigned int* indices, unsigned int _indicesCount, const float _xPos, const float _yPos, const float _zPos) {
 	RenderObj obj;
+	obj.meshesCount = 1;
+	obj.objMeshes = (Mesh*)malloc(sizeof(Mesh) * obj.meshesCount);
 
-	obj.spanCount = 3; // three different attributes to the verticies
-	obj.spans = (unsigned int*)malloc((sizeof(unsigned int) * obj.spanCount));
-	obj.spans[0] = 3; // position
-	obj.spans[1] = 2; // texture coords
-	obj.spans[2] = 3; // normal
-	obj.totalSpan = 8;
-	obj.rawVertCount = _vertCount;
-	obj.rawVertSize = _vertCount * sizeof(float);
-	obj.rawVertices = (float*)malloc(_vertCount * sizeof(float));
-	for (int i = 0; i < obj.rawVertCount; i++) {
-		obj.rawVertices[i] = verts[i];
-	}
+	for (int mi = 0; mi < obj.meshesCount; mi++) {
+		Mesh* _mesh = &obj.objMeshes[mi];
+		_mesh->totalSpan = 8;
 
-	//optional for indices
-	if (_indicesCount > 0 && indices != NULL) {
-		obj.indicesCount = _indicesCount;
-		obj.indicesSize = _indicesCount * sizeof(unsigned int);
-		obj.indices = (unsigned int*)malloc(sizeof(unsigned int) * obj.indicesCount);
-		for (int i = 0; i < obj.indicesCount; i++) {
-			obj.indices[i] = indices[i];
+		_mesh->indicesCount = _indicesCount;
+		_mesh->indicesSize = sizeof(uint32_t) * _mesh->indicesCount;
+		_mesh->indices = (uint32_t*)malloc(_mesh->indicesSize);
+		for (int i = 0; i < _mesh->indicesCount; i++) {
+			_mesh->indices[i] = indices[i];
 		}
+
+		_mesh->vertCount = _vertCount / _mesh->totalSpan;
+		_mesh->vertSize = sizeof(Vertex) * _mesh->vertCount;
+		_mesh->vertices = (Vertex*)malloc(_mesh->vertSize);
+		for (int vi = 0; vi < _vertCount; vi+=8) {
+			_mesh->vertices[vi / _mesh->totalSpan].position.x = verts[vi];
+			_mesh->vertices[vi / _mesh->totalSpan].position.y = verts[vi+1];
+			_mesh->vertices[vi / _mesh->totalSpan].position.z = verts[vi+2];
+
+			_mesh->vertices[vi / _mesh->totalSpan].textureCoords.x = verts[vi+3];
+			_mesh->vertices[vi / _mesh->totalSpan].textureCoords.y = verts[vi+4];
+
+			_mesh->vertices[vi / _mesh->totalSpan].normal.x = verts[vi+5];
+			_mesh->vertices[vi / _mesh->totalSpan].normal.y = verts[vi+6];
+			_mesh->vertices[vi / _mesh->totalSpan].normal.z = verts[vi+7];
+		}
+
+		_mesh->textureCount = 1;
+		_mesh->textureSize = sizeof(Texture) * _mesh->textureCount;
+		_mesh->textures = (Texture*)malloc(_mesh->textureSize);
+		for (int ti = 0; ti < _mesh->textureCount; ti++) {
+			Texture* _texture = &_mesh->textures[ti];
+			_texture->textureData = stbi_load("container.jpg", &_texture->t_width, &_texture->t_height, &_texture->nrChannels, 0);
+		}
+		
+		Mesh_RawVertsInit(_mesh);
 	}
+
 	obj.objShader = Shader("v_shader.vertshader", "f_shader.fragshader");
-	obj.textureData = stbi_load("container.jpg", &obj.t_width, &obj.t_height, &obj.nrChannels, 0);
 	obj.xPos = _xPos;
 	obj.yPos = _yPos;
 	obj.zPos = _zPos;
+	obj.xScale = 1.0f;
+	obj.yScale = 1.0f;
+	obj.zScale = 1.0f;
 	obj.rotation = glm::quat(glm::vec3(0.0f,0.0f,0.0f));
 
 	RenderCache_Add(&obj);
@@ -240,45 +261,11 @@ void RenderCache_AddMesh(const char* _scene, ufbx_load_opts* opts, ufbx_error* f
 		fprintf(stderr, "Failed to load: %s\n", fbx_error->description.data);
 		exit(1);
 	}
-	// decipher the fbx object to get verticies and animations
-	RenderObj _mesh;
-	for (int i = 0; i < scene->nodes.count; i++) {
-		auto node = scene->nodes.data[i];
-		if (node->is_root) continue;
-		// Create a RenderObj
-		if (strcmp(node->element.name.data,"PILOT1") == 0 && node->mesh) {
-			auto pilotMesh = node->mesh;
-			// triangle based importing
-
-			size_t num_tri_indices = pilotMesh->max_face_triangles * 3;
-			uint32_t* tri_indices = (uint32_t*)malloc(sizeof(uint32_t) * num_tri_indices);
-			Vertex* tri_vertices = (Vertex*)malloc(sizeof(Vertex) * num_tri_indices);
-			size_t* indices = (size_t*)malloc(sizeof(size_t) * pilotMesh->max_face_triangles * 3);
-			for (int j = 0; j < pilotMesh->num_faces; j++) {
-				ufbx_face face = pilotMesh->faces.data[j];
-				size_t num_tris = ufbx_triangulate_face(tri_indices, num_tri_indices, pilotMesh, face);
-
-
-			}
-			
-			
-
-			//_mesh.xPos = node->local_transform.translation.x;
-			//_mesh.yPos = node->local_transform.translation.y;
-			//_mesh.zPos = node->local_transform.translation.z;
-			_mesh.rotation.x = node->local_transform.rotation.x;
-			_mesh.rotation.y = node->local_transform.rotation.y;
-			_mesh.rotation.z = node->local_transform.rotation.z;
-			_mesh.rotation.w = node->local_transform.rotation.w;
-		}
-	}
-
-	_mesh.xPos = 0.0f;
-	_mesh.yPos = 0.0f;
-	_mesh.zPos = 0.0f;
-	_mesh.objShader = Shader("v_shader.vertshader", "f_shader.fragshader");
-	_mesh.textureData = stbi_load("CV22TS.jpg", &_mesh.t_width, &_mesh.t_height, &_mesh.nrChannels, 0);
-	//RenderCache_Add(&_mesh);
+	
+	RenderObj* _fbxObj = (RenderObj*)malloc(sizeof(RenderObj));
+	RenderObj_ReadFBX(_fbxObj, scene, "CV22TS.jpg");
+	
+	RenderCache_Add(_fbxObj);
 }
 
 void RenderCache_Draw(glm::mat4 _view, glm::mat4 _proj, float _time) {
