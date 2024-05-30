@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
+set(CMAKE_CXX_STANDARD 20)
+
 project(root_engine)
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Tools/")
@@ -17,4 +19,4 @@ target_link_libraries(render_pipeline_test camera render_obj glad ufbx stbi "${C
 project(standalone_test)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Testing/")
 add_executable(standalone_test "${CMAKE_CURRENT_SOURCE_DIR}/Testing/test_main.cpp")
-target_include_directories(standalone_test PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Testing/include/")
+target_link_libraries(render_pipeline_test game_world)

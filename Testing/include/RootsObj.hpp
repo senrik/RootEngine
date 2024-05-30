@@ -1,13 +1,19 @@
-#ifndef RENDER_OBJECT_H
-#define RENDER_OBJECT_H
-#include "shader.h"
-typedef struct RootsObj {
+#ifndef ROOTS_OBJECT_H
+#define ROOTS_OBJECT_H
+//#include <Shader/shader.h>
+class RootsObj {
+public:
+	RootsObj();
+	RootsObj(const RootsObj&);
+	~RootsObj();
+	void SerializeRootsObj();
+private:
 	float* verts;
 	unsigned int vert_count;
 	unsigned int* spans;
 	unsigned int span_count;
-	Shader shader;
+
 	unsigned int t_width, t_height;
 	unsigned char* textureData;
-} RootsObj;
+};
 #endif
