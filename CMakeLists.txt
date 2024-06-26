@@ -19,4 +19,4 @@ target_link_libraries(render_pipeline_test camera render_obj glad ufbx stbi "${C
 project(standalone_test)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Testing/")
 add_executable(standalone_test "${CMAKE_CURRENT_SOURCE_DIR}/Testing/test_main.cpp")
-target_link_libraries(render_pipeline_test game_world)
+target_link_libraries(standalone_test game_world asset_io)
