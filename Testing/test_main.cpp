@@ -1,6 +1,7 @@
-#include <asset_io.h>
-
+#include <stdio.h>
+#include <data_types.h>
 // C:\Users\sswanson33\Documents\V22 Model\CV22 FBX\cv22_rig01_export06.fbx
+
 
 float diamondVerts[] = {
 	// position			   // texcoords
@@ -40,10 +41,10 @@ float diamondVerts[] = {
 
 int main(int argc, char* argv[]) {
 
-	rt_string vertShader = read_textfile("v_shader.vertshader");
-
-	printf_s("Vert Shader:\n%s", vertShader.data);
-
+	
+	printf_s("Default Vert Shader:\n%s", DEFAULT_VERT_CODE);
+	//RenderCache* cache = (RenderCache*)malloc(sizeof(RenderCache));
+	//RenderCache_Init(cache);
 	
 	return 0;
 }
