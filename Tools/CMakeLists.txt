@@ -3,7 +3,7 @@
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
 
 add_library(data_types INTERFACE)
-target_include_directories(data_types SYSTEM INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/data_types/include/")
+target_include_directories(data_types SYSTEM INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/data_types/")
 
 add_library(data_struct STATIC "${CMAKE_CURRENT_SOURCE_DIR}/data_struct/data_struct.c")
 target_include_directories(data_struct PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/data_struct/include/")
