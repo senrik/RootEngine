@@ -1,10 +1,10 @@
 #ifndef DATA_STRUCT_H
 #define DATA_STRUCT_H
+#include <data_types.h>
+#include <stdlib.h> // used for malloc/realloc
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include <data_types.h>
-#include <stdlib.h> // used for malloc/realloc
 
 // TODO: Implement our own memory management instead of using stdlib's stuff
 

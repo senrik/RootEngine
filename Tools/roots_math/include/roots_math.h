@@ -1,9 +1,10 @@
 #ifndef ROOTS_MATH_H
 #define ROOTS_MATH_H
+#include <math.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include <math.h>
+
 
 
 typedef struct rt_vec2 {
@@ -73,7 +74,7 @@ rt_quat euler_to_quat(const rt_vec3*);
 rt_quat compose_quat(const rt_quat*, const rt_quat*);
 
 void mat4_init(rt_mat4*, const double);
-void mat4_translate(rt_mat4*, const rt_vec3*);
+void mat4_translate(rt_mat4*, rt_vec3*);
 rt_mat4 quat_to_mat4(const rt_quat*);
 rt_mat4 dot_product(const rt_mat4*, const rt_mat4*);
 rt_mat4 cross_product(const rt_mat4*, const rt_mat4*);

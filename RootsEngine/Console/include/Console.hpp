@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CONSOLE_H
+#define CONSOLE_H
 #include <map>
 #include <iostream>
 #include <string>
@@ -23,3 +24,5 @@ public:
 	static void CallFunction(const std::string&, const int[]);
 	static void Input(std::istream&);
 };
+
+#endif

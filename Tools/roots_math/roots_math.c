@@ -86,7 +86,7 @@ rt_quat euler_to_quat(const rt_vec3* _vec) {
 	return (rt_quat) { s.x* c.y* c.z - c.x * s.y * s.z, c.x* s.y* c.z + s.x * c.y * s.z, c.x* c.y* s.z - s.x * s.y * c.z, c.x* c.y* c.z + s.x * s.y * s.z };
 }
 rt_quat compose_quat(const rt_quat* _quatl, const rt_quat* _quatr) {
-
+	//TODO
 }
 // Implementation taken from the GLM library
 double pitch(const rt_quat* q) {
@@ -110,20 +110,32 @@ double clamp(const double _v, const double _min, const double _max) {
 	}
 }
 
+
+/* Transformation Matrix
+* | s 0 0 T | : x scale and x position
+* | 0 s 0 T | : y scale and y position
+* | 0 0 s T | : z scale and z position
+* | 0 0 0 1 | : w used for quaternion transformations
+
+
+*/
 void mat4_init(rt_mat4* _mat, const double _d) {
 	for (int i = 0; i < 4; i++) {
 		_mat->cols[i].v[i] = _d;
 	}
 }
-void mat4_translate(rt_mat4* _mat, const rt_vec3* _vec) {
-
+void mat4_translate(rt_mat4* _mat, rt_vec3* _vec) {
+	//TODO
+	_mat->cols[3].x += _vec->x;
+	_mat->cols[3].y += _vec->y;
+	_mat->cols[3].z += _vec->z;
 }
 rt_mat4 quat_to_mat4(const rt_quat* _quat) {
-
+	//TODO
 }
 rt_mat4 dot_product(const rt_mat4* _matr, const rt_mat4* _matl) {
-
+	//TODO
 }
 rt_mat4 cross_product(const rt_mat4* _matr, const rt_mat4* _matl) {
-
+	//TODO
 }
