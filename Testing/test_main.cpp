@@ -7,7 +7,7 @@
 int main(int argc, char* argv[]) {
 
 	
-	printf_s("Default Vert Shader:\n%s", DEFAULT_VERT_CODE);
+	printf_s("Default Vert Shader:\n%s", DEFAULT_VERT_PATH);
 	//RenderCache* cache = (RenderCache*)malloc(sizeof(RenderCache));
 	//RenderCache_Init(cache);
 	
