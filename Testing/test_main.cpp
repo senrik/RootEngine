@@ -1,13 +1,16 @@
 #include <stdio.h>
-#include <data_types.h>
-#include <glfw3.h>
+#include <asset_io.h>
+#include <data_struct.h>
+
 // C:\Users\sswanson33\Documents\V22 Model\CV22 FBX\cv22_rig01_export06.fbx
 
 
 int main(int argc, char* argv[]) {
 
-	
-	printf_s("Default Vert Shader:\n%s", DEFAULT_VERT_PATH);
+	rt_string fileContents;
+	rt_string_init(&fileContents);
+	read_textfile(&fileContents, "./assets/vert_color.vertshader");
+	printf_s("%s\n", fileContents.data);
 	//RenderCache* cache = (RenderCache*)malloc(sizeof(RenderCache));
 	//RenderCache_Init(cache);
 	
