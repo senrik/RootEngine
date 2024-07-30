@@ -10,9 +10,10 @@ extern "C" {
 #endif
 
 
-rt_string read_textfile(const char *);
+void read_textfile(rt_string*,const char *);
 
-char* load_image(const char*, int*, int*, int*, int);
+unsigned char* load_image(const char*, int*, int*, int*, int);
+void write_binaryfile(char*, RTuint, unsigned char[]);
 #ifdef __cplusplus
 }
 #endif

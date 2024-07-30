@@ -11,13 +11,13 @@ extern "C" {
 #define INITIAL_STRING_SIZE 128
 typedef struct rt_string {
 	char* data;
-	uint length;
-	uint size;
+	RTuint length;
+	RTuint size;
 } rt_string;
 
 void rt_string_init(rt_string*);
 void rt_string_append(rt_string*, const rt_string*);
-void rt_string_char_append(rt_string*, const char*, uint);
+void rt_string_char_append(rt_string*, const char*, RTuint);
 void rt_string_clear(rt_string*);
 void rt_string_terminate(rt_string*);
 

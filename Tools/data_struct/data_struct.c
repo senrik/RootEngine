@@ -22,7 +22,7 @@ void rt_string_append(rt_string* _str, const rt_string* _app) {
 	rt_string_char_append(_str, _app->data, _app->length);
 }
 
-void rt_string_char_append(rt_string* _str, const char* s, uint _length) {
+void rt_string_char_append(rt_string* _str, const char* s, RTuint _length) {
 	if (_length > _str->size / 2 || _str->length + _length > _str->size) {
 		rt_string_resize(_str);
 	}
@@ -56,7 +56,7 @@ void rt_string_terminate(rt_string* _str) {
 /// </summary>
 /// <param name="_str"></param>
 void rt_string_resize(rt_string* _str) {
-	if (_str->data != NULL) {
+	if (_str != NULL && _str->data != NULL) {
 		_str->data = (char*)realloc(_str->data, sizeof(char)*_str->size * 2);
 		_str->size *= 2;
 	}
