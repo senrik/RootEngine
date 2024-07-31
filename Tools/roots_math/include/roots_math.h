@@ -78,6 +78,7 @@ void mat4_translate(rt_mat4*, rt_vec3*);
 rt_mat4 quat_to_mat4(const rt_quat*);
 rt_mat4 dot_product(const rt_mat4*, const rt_mat4*);
 rt_mat4 cross_product(const rt_mat4*, const rt_mat4*);
+rt_mat4 perspective(const double, const double, const double, const double);
 #ifdef __cplusplus
 }
 #endif
