@@ -133,9 +133,33 @@ void mat4_translate(rt_mat4* _mat, rt_vec3* _vec) {
 rt_mat4 quat_to_mat4(const rt_quat* _quat) {
 	//TODO
 }
+// R width must be L height
+/*                    b1b2b3b4 
+*                      v v v v
+* a1 -> | 1 0 0 0 |  | 2 0 0 0 |   | a1*b1 a1*b2 a1*b3 a1*b4 |
+* a2 -> | 0 1 0 0 |  | 0 2 0 0 | _ | a2*b1 a2*b2 a2*b3 a2*b4 |
+* a3 -> | 0 0 1 0 |  | 0 0 2 0 | - | a3*b1 a3*b2 a3*b3 a3*b4 |
+* a4 -> | 0 0 0 1 |  | 0 0 0 2 |   | a4*b1 a4*b2 a4*b3 a4*b4 |
+*      A             B
+*/
 rt_mat4 dot_product(const rt_mat4* _matr, const rt_mat4* _matl) {
 	//TODO
+	return (rt_mat4) {
+		    _matr->m00* _matl->m00, _matr->m00* _matl->m01, _matr->m00* _matl->m02, _matr->m00* _matl->m03,
+			_matr->m01* _matl->m00, _matr->m01* _matl->m01, _matr->m01* _matl->m02, _matr->m01* _matl->m03,
+			_matr->m02* _matl->m00, _matr->m02* _matl->m01, _matr->m02* _matl->m02, _matr->m02* _matl->m03,
+			_matr->m03* _matl->m00, _matr->m03* _matl->m01, _matr->m03* _matl->m02, _matr->m03* _matl->m03,
+	};
 }
+
+/*                      b1b2b3b4
+*                        v v v v
+* a1 -> | 1 0 0 0 |    | 2 0 0 0 |   
+* a2 -> | 0 1 0 0 | \/ | 0 2 0 0 | _ 
+* a3 -> | 0 0 1 0 | /\ | 0 0 2 0 | - 
+* a4 -> | 0 0 0 1 |    | 0 0 0 1 |   
+*            A              B
+*/
 rt_mat4 cross_product(const rt_mat4* _matr, const rt_mat4* _matl) {
 	//TODO
 }
