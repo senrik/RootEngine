@@ -90,10 +90,10 @@ rt_quat compose_quat(const rt_quat* _quatl, const rt_quat* _quatr) {
 }
 // Implementation taken from the GLM library
 double pitch(const rt_quat* q) {
-	return atan(2 * (q->y * q->z + q->w * q->x), q->w * q->w - q->x * q->x - q->y * q->y + q->z * q->z);
+	return 0;//atan(2 * (q->y * q->z + q->w * q->x), q->w * q->w - q->x * q->x - q->y * q->y + q->z * q->z);
 }
 double roll(const rt_quat* q) {
-	return atan(2 * (q->x * q->y + q->w * q->z), q->w * q->w + q->x * q->x - q->y * q->y - q->z * q->z);
+	return 0;//atan(2 * (q->x * q->y + q->w * q->z), q->w * q->w + q->x * q->x - q->y * q->y - q->z * q->z);
 }
 double yaw(const rt_quat* q) {
 	
