@@ -29,6 +29,7 @@ x86/
 bld/
 [Bb]in/
 [Bb]uild/
+Tools/third_party/[Bb]uild/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
