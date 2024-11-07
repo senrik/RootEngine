@@ -14,7 +14,7 @@ float defaultPlaneVerts[] = {
 		 0.5f, -0.5f,  0.0f,    1.0f, 1.0f,   0.0f, 0.0f, -1.0f,
 };
 
-int defaultPlaneIndices[] = {
+RTuint defaultPlaneIndices[] = {
 		0, 1, 2,
 		2, 3, 1
 };

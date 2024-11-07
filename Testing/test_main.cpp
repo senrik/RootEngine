@@ -1,16 +1,12 @@
 #include <stdio.h>
-#include <asset_io.h>
-#include <data_struct.h>
 #include <roots_math.h>
 // C:\Users\sswanson33\Documents\V22 Model\CV22 FBX\cv22_rig01_export06.fbx
 
 
 int main(int argc, char* argv[]) {
 
-	
-	//RenderCache* cache = (RenderCache*)malloc(sizeof(RenderCache));
-	//RenderCache_Init(cache);
-	
+	printf_s("Hello, world!");
+	rt_vec2* _vec = (rt_vec2*)malloc(sizeof(rt_vec2));
 	return 0;
 }
 

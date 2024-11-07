@@ -13,7 +13,7 @@ extern "C" {
 #define DEFAULT_CUBE_VERT_COUNT 64
 #define DEFAULT_CUBE_INDEX_COUNT 36
 	extern float defaultCubeVerts[];
-	RTuint defaultCubeIndices[];
+	extern RTuint defaultCubeIndices[];
 
 #define DEFAULT_DIAMOND_VERT_COUNT 48
 #define DEFAULT_DIAMOND_INDEX_COUNT 24

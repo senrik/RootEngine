@@ -10,43 +10,43 @@ extern "C" {
 typedef struct rt_vec2 {
 	union {
 		struct {
-			double x, y;
+			float x, y;
 		};
-		double v[2];
+		float v[2];
 	}; 
 } rt_vec2;
 
 typedef struct rt_vec3 {
 	union {
-		struct { double x, y, z; };
-		double v[3];
+		struct { float x, y, z; };
+		float v[3];
 	};
 } rt_vec3;
 
 typedef struct rt_vec4 {
 	union {
-		struct { double x, y, z, w; };
-		double v[4];
+		struct { float x, y, z, w; };
+		float v[4];
 	};
 } rt_vec4;
 
 typedef struct rt_quat {
 	union {
-		struct { double x, y, z, w; };
-		double v[4];
+		struct { float x, y, z, w; };
+		float v[4];
 	};
 } rt_quat;
 
 typedef struct rt_mat4 {
 	union {
 		struct {
-			double m00, m10, m20, m30,
+			float m00, m10, m20, m30,
 				m01, m11, m21, m31,
 				m02, m12, m22, m32,
 				m03, m13, m23, m33;
 		};
 		rt_vec4 cols[4];
-		double v[16];
+		float v[16];
 	};
 } rt_mat4;
 
