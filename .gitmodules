@@ -2,3 +2,9 @@
 	path = Tools/third_party/glfw
 	url = git@github.com:glfw/glfw.git
 	branch = master
+[submodule "rootengine-tools"]
+	path = rootengine-tools
+	url = git@github.com:senrik/rootengine-tools.git
+[submodule "rootengine-renderpipeline"]
+	path = rootengine-renderpipeline
+	url = git@github.com:senrik/rootengine-renderpipeline.git
