@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <roots_math.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 // C:\Users\sswanson33\Documents\V22 Model\CV22 FBX\cv22_rig01_export06.fbx
 
 
