@@ -29,9 +29,6 @@ StatModifiers Item::Use() {
 	return _stats;
 }
 
-EntityType Item::GetType() {
-	return _type;
-}
 
 std::string Item::ToString(){
 	std::string _output = "";

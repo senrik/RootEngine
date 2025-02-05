@@ -1,4 +1,5 @@
 #include <iostream>
+#include <GameWorld.hpp>
 using namespace std;
 
 /*
@@ -14,15 +15,15 @@ using namespace std;
 int main(int argc, char* argv[]) {
 	int exitCode = -1;
 
-	// GameWorld gameWorld = GameWorld();
-	// gameWorld.PopulateGameWorld();
-	// while (exitCode < 0) {
-	// 	char* input = new char[10];
-	// 	cin.getline(input, 10);
-	// 	cout << gameWorld.ToString();
+	GameWorld gameWorld = GameWorld();
+	gameWorld.PopulateGameWorld();
+	while (exitCode < 0) {
+		char* input = new char[10];
+		cin.getline(input, 10);
+		cout << gameWorld.ToString();
 
-	// 	gameWorld.PopulateGameWorld();
-	// }
+		gameWorld.PopulateGameWorld();
+	}
 	
 	
 	return 0;

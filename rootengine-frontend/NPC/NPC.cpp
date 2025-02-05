@@ -55,6 +55,11 @@ Loot NPC::GetLoot() {
 	return npcLoot;
 }
 
+NPC::~NPC()
+{
+
+}
+
 std::string NPC::ToString() {
 	return "I am an NPC, this is a placeholder, doot doot.";
 }
@@ -68,4 +73,5 @@ void NPC::GenerateEntity()
 	// 3 - 20%: rand() % 100 > 80 = 100 - 80/i+1 @ 2
 	// 4 - 10%: rand() % 100 > 90 = 100 - 80/i+1 @ 3
 	GenerateLootTable();
+	this->_type = EntityType::NPC_Friendly;
 }

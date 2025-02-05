@@ -12,10 +12,9 @@ enum EntityType {
 
 class Entity {
     public:
-        virtual ~Entity() = 0;
         virtual std::string ToString() = 0;
         virtual void GenerateEntity() = 0;
-        virtual EntityType GetType() = 0;
+        inline EntityType GetType() { return _type; };
     protected:
         
         static unsigned int ID;

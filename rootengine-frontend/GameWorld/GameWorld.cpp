@@ -102,9 +102,11 @@ Region::Region(const string& _label) {
 		neighbors[i] = nullptr;
 	}
 }
-
+// Adds a new area to the region.
+// Placement is determined by random chance on
 void Region::AddArea(const Area& _area) {
 	areas.push_back(_area);
+	
 }
 
 string Region::ListAreas() {
@@ -187,16 +189,20 @@ void GameWorld::PopulateGameWorld() {
 	world = new World("World");
 	vector<Area*> fringe;
 	size_t regionNum = rand() % (MAX_REGIONS - MIN_REGIONS) + MIN_REGIONS;
+	cout << "[GameWorld] RegionNum: "<< regionNum << endl;
 	for (int i = 0; i < regionNum; i++) {
 		// Steps for populating a region
 		// create the region
-		Region _newRegion = Region("Region " + to_string(i));
+		Region* _newRegion = new Region("Region " + to_string(i));
 		// determine the number of areas
 		size_t areaNum = rand() % (MAX_AREAS_IN_REGION - MIN_AREAS_IN_REGION) + MIN_AREAS_IN_REGION;
 		// create an area
-		Area* _newArea = new Area("This is an area.", "Area 0");
+		cout << "[GameWorld] Region " << i << " has "  << areaNum << " areas."<<  endl;
+		
+		PopulateRegion(*_newRegion, areaNum);
+
 		// Populate the Area
-		PopulateArea(*_newArea);
+		
 		// Add the area's neighbors to our vector
 		/*for (int j = 0; j < 4; j++) {
 			fringe.push_back(_newArea->GetNeighbor(j));
@@ -242,6 +248,16 @@ void PopulateArea(Area& _area) {
 	size_t itemInArea = rand() % ITEMS_PER_AREA;
 	for (int l = 0; l < itemInArea; l++) {
 		_area.AddItem(new Item());
+	}
+}
+
+void PopulateRegion(Region& _region, const size_t& _areaNum){
+	for( int i = 0; i < _areaNum; i++) {
+		// Create
+		Area* _newArea = new Area("This is an area.", "Area 0");
+		// Place
+		_region.AddArea(*_newArea);
+		// Populate
 	}
 }
 #pragma endregion

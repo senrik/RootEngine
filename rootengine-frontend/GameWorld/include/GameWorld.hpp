@@ -3,9 +3,8 @@
 #include <iostream>
 #include <vector>
 #include <format>
-#include "Entity.hpp"
-#include "NPC.hpp"
-#include "Item.hpp"
+#include <NPC.hpp>
+#include <Item.hpp>
 using namespace std;
 constexpr int ITEMS_PER_AREA = 3;
 constexpr int NPCS_PER_AREA = 3;
@@ -94,4 +93,6 @@ AreaLink Pop(vector<AreaLink>&);
 AreaLink& LinkParentAndArea(AreaLink&, const size_t&);
 
 void PopulateArea(Area&);
+
+void PopulateRegion(Region&, const size_t&);
 #endif

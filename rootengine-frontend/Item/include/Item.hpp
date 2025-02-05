@@ -1,6 +1,6 @@
 #ifndef ITEM_H
 #define ITEM_H
-#include "Entity.hpp"
+#include <Entity.hpp>
 
 enum Statistics {
 	Health = 0,
@@ -21,7 +21,6 @@ public:
 	Item(const EntityType&, const StatModifiers&);
 	~Item();
 	StatModifiers Use();
-	EntityType GetType() override;
 	void GenerateEntity() override;
     std::string ToString() override;
 

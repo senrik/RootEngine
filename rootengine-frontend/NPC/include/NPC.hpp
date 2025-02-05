@@ -1,7 +1,7 @@
 #ifndef NPC_H
 #define NPC_H
-#include "Entity.hpp"
-#include "Item.hpp"
+#include <Entity.hpp>
+#include <Item.hpp>
 #include <vector>
 #include <cmath>
 
@@ -18,8 +18,8 @@ public:
 	bool IsHostile();
 	std::string Response();
 	Loot GetLoot();
+	~NPC();
 	std::string ToString() override;
-	EntityType GetType() override;
 	void GenerateEntity() override;
 private:
 	bool hostile;
