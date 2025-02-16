@@ -44,36 +44,7 @@ ostream& operator<<(ostream& out, const Region& _region) {
 }
 
 
-AreaLink& LinkParentAndArea(AreaLink& link, const size_t& areaCount) {
-	link.area = new Area();
-	link.area->number = areaCount;
-	link.area->posLat = link.parent->posLat;
-	link.area->posLong = link.parent->posLong;
-	// link area to parent
 
-	link.area->neighbors[link.parentDirection] = link.parent;
-	// link parent and set position
-	switch (link.parentDirection) {
-	case CompassEnum::North:
-		link.parent->neighbors[CompassEnum::South] = link.area;
-		link.area->posLong--;
-		break;
-	case CompassEnum::South:
-		link.parent->neighbors[CompassEnum::North] = link.area;
-		link.area->posLong++;
-		break;
-	case CompassEnum::East:
-		link.parent->neighbors[CompassEnum::West] = link.area;
-		link.area->posLat--;
-		break;
-	case CompassEnum::West:
-		link.parent->neighbors[CompassEnum::East] = link.area;
-		link.area->posLat++;
-		break;
-	}
-
-	return link;
-}
 
 vector<AreaLink>& AddAreaLinks(vector<AreaLink>& f, const AreaLink& prev) {
 	// TO-DO: find a way to randomize this seleciton
@@ -116,6 +87,7 @@ void Region::InitializeRegion() {
 	this->root->posLong = 0;
 	this->areas[0] = this->root;
 	int areaCount = 1;
+	// Create AreaLinks for all neighboring areas
 	for (int i = 0; i < 4; i++) {
 		AreaLink _temp;
 		if (this->root->neighbors[i] == nullptr) {
@@ -168,26 +140,6 @@ void Region::InitializeRegion() {
 
 		areaCount++;
 	}
-}
-
-AreaLink Pop(vector<AreaLink>& v) {
-	AreaLink _tempLink;
-
-	_tempLink = v.back();
-	v.pop_back();
-
-	return _tempLink;
-
-}
-
-AreaLink Dequeue(vector<AreaLink>& v) {
-	AreaLink _tempLink;
-
-	vector<AreaLink>::const_iterator _iter = v.begin();
-	_tempLink = v.front();
-	v.erase(_iter);
-
-	return _tempLink;
 }
 
 int TraverseWorld(Region* region) {

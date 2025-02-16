@@ -1,9 +1,93 @@
 #include "GameWorld.hpp"
 
+
+
 ostream& operator <<(ostream& strm, CompassEnum compass) {
 	const string nameCompass[] = { "North", "South", "East", "West" };
 
 	return strm << nameCompass[compass];
+}
+
+AreaLink Pop(vector<AreaLink>& v) {
+	AreaLink _tempLink;
+
+	_tempLink = v.back();
+	v.pop_back();
+
+	return _tempLink;
+
+}
+
+AreaLink Dequeue(vector<AreaLink>& v) {
+	AreaLink _tempLink;
+
+	vector<AreaLink>::const_iterator _iter = v.begin();
+	_tempLink = v.front();
+	v.erase(_iter);
+
+	return _tempLink;
+}
+
+AreaLink& LinkParentAndArea(AreaLink& link, const size_t& areaCount) {
+	link.area = new Area();
+	link.area->SetNumber(areaCount);
+	link.area->SetPosition(link.parent->GetLat(), link.parent->GetLong());
+	
+	// link area to parent
+
+	link.area->SetNeighbor(link.parentDirection, link.parent);
+	// link parent and set position
+	switch (link.parentDirection) {
+	case CompassEnum::North:
+		link.parent->SetNeighbor(CompassEnum::South, link.area);
+		link.area->SetPosition(link.area->GetLat(), link.area->GetLong() - 1);
+		break;
+	case CompassEnum::South:
+		link.parent->SetNeighbor(CompassEnum::North, link.area);
+		link.area->SetPosition(link.area->GetLat(), link.area->GetLong() + 1);
+		break;
+	case CompassEnum::East:
+		link.parent->SetNeighbor(CompassEnum::West, link.area);
+		link.area->SetPosition(link.area->GetLat() - 1, link.area->GetLong());
+		break;
+	case CompassEnum::West:
+		link.parent->SetNeighbor(CompassEnum::East, link.area);
+		link.area->SetPosition(link.area->GetLat() +1, link.area->GetLong());
+		break;
+	}
+
+	return link;
+}
+
+vector<AreaLink>& AddAreaLinks(vector<AreaLink>& f, const AreaLink& prev) {
+	for (int i = 0; i < 4; i++) {
+		AreaLink _newTemp;
+		if (prev.area->GetNeighbor(i) == nullptr) {
+			_newTemp.parent = prev.area;
+			if (i % 2 == 0) {
+				if (i > 0) {
+					_newTemp.parentDirection = CompassEnum::West;
+				}
+				else {
+					_newTemp.parentDirection = CompassEnum::South;
+				}
+			}
+			else {
+				if (i > 1) {
+					_newTemp.parentDirection = CompassEnum::East;
+				}
+				else {
+					_newTemp.parentDirection = CompassEnum::North;
+				}
+			}
+			_newTemp.area = prev.area->GetNeighbor(i);
+
+			// add to collection
+			f.push_back(_newTemp);
+		}
+	}
+
+	return f;
 }
 
 #pragma region Area Implementation
@@ -32,18 +116,28 @@ Area::Area(const string& desc, const string& label) {
 }
 
 string Area::DescribeArea() {
-	string _output = format("{} {}\n", this->label, this->description);
-	_output += format("Has {} items:\n", this->items.size());
-	for (int i = 0; i < this->items.size(); i++)
-	{
-		
-		_output += this->items.at(i)->ToString();
+	string _output = format("{}[{}] {}\n", this->label, this->number, this->description);
+	if(items.size() <= 0 ){
+		_output += "You look around, but find nothing of use.\n";
 	}
-	_output += format("Has {} NPCs: \n", this->npcs.size());
-	for (int i = 0; i < this->npcs.size(); i++)
-	{
-		_output += this->npcs.at(i)->ToString();
+	else {
+		_output += format("Has {} items:\n", this->items.size());
+		for (int i = 0; i < this->items.size(); i++)
+		{
+			_output += this->items.at(i)->ToString();
+		}	
 	}
+	if(items.size() <= 0) {
+		_output += "A stillness fills the room, there is no one here.";
+	}
+	else{
+		_output += format("Has {} NPCs: \n", this->npcs.size());
+		for (int i = 0; i < this->npcs.size(); i++)
+		{
+			_output += this->npcs.at(i)->ToString();
+		}
+	}
+	
 	return _output;
 }
 
@@ -57,6 +151,10 @@ void Area::SetNeighbor(const size_t& _index, Area* _area) {
 
 Area* Area::GetNeighbor(const size_t& index) {
 	return this->neighbors[index];
+}
+
+int Area::GetNumber() const {
+	return number;
 }
 
 void Area::AddItem(Entity* _item) {
@@ -76,12 +174,31 @@ ostream& operator<<(ostream& out, const Area& _area) {
 	*        [1]
 	*
 	*/
-	out << format("       {}       \n       ^\n       |\n{} < - {} - > {}\n       |\n       v\n       {}\n",
-		(_area.neighbors[0] != nullptr) ? _area.neighbors[0]->label : "None",
-		(_area.neighbors[3] != nullptr) ? _area.neighbors[3]->label : "None",
-		_area.label,
-		(_area.neighbors[2] != nullptr) ? _area.neighbors[2]->label : "None",
-		(_area.neighbors[1] != nullptr) ? _area.neighbors[1]->label : "None");
+	/* New format:
+		Area: [ Label ]
+	 *----------[ ]----------*
+	 |						 |
+	 |						 |
+	[ ]						[ ]
+	 |						 |
+	 |						 |
+	 *----------[ ]----------*
+
+
+	*/
+	// out << format("       {}       \n       ^\n       |\n{} < - {} - > {}\n       |\n       v\n       {}\n",
+	// 	(_area.neighbors[0] != nullptr) ? _area.neighbors[0]->label : "None",
+	// 	(_area.neighbors[3] != nullptr) ? _area.neighbors[3]->label : "None",
+	// 	_area.label,
+	// 	(_area.neighbors[2] != nullptr) ? _area.neighbors[2]->label : "None",
+	// 	(_area.neighbors[1] != nullptr) ? _area.neighbors[1]->label : "None");
+	out << format("\n\tArea: [ {} ]\n *----------[{}]----------*\n",
+			_area.number, _area.neighbors[0] != nullptr ? "O" : "0");
+	out << " |                       |\n |                       |\n";
+	out << format("[{}]                     [{}]\n",_area.neighbors[3] != nullptr ? "O" : "0",
+				_area.neighbors[2] != nullptr ?  "O" : "0");
+	out << " |                       |\n |                       |\n";
+	out << format(" *----------[{}]----------*",_area.neighbors[1] != nullptr ?  "O" : "0");
 	return out;
 }
 #pragma endregion
@@ -170,8 +287,12 @@ string World::DescribeWorld() {
 #pragma endregion
 
 #pragma region GameWorld
+
+
 GameWorld::GameWorld() {
 	world = new World("World");
+	
+	//std::cout << "Init roll: " << dist(gen)%100; 
 }
 // An area can only have four connections, these are pointers to the different areas
 // Area* neighbors[];
@@ -187,9 +308,8 @@ GameWorld::GameWorld() {
 void GameWorld::PopulateGameWorld() {
 	delete world;
 	world = new World("World");
-	vector<Area*> fringe;
 	size_t regionNum = rand() % (MAX_REGIONS - MIN_REGIONS) + MIN_REGIONS;
-	cout << "[GameWorld] RegionNum: "<< regionNum << endl;
+	//cout << "[GameWorld] RegionNum: "<< regionNum << endl;
 	for (int i = 0; i < regionNum; i++) {
 		// Steps for populating a region
 		// create the region
@@ -197,10 +317,11 @@ void GameWorld::PopulateGameWorld() {
 		// determine the number of areas
 		size_t areaNum = rand() % (MAX_AREAS_IN_REGION - MIN_AREAS_IN_REGION) + MIN_AREAS_IN_REGION;
 		// create an area
-		cout << "[GameWorld] Region " << i << " has "  << areaNum << " areas."<<  endl;
+		//cout << "[GameWorld] Region " << i << " has "  << areaNum << " areas."<<  endl;
 		
-		PopulateRegion(*_newRegion, areaNum);
+		this->PopulateRegion(*_newRegion, areaNum);
 
+		world->AddRegion(*_newRegion);
 		// Populate the Area
 		
 		// Add the area's neighbors to our vector
@@ -209,6 +330,7 @@ void GameWorld::PopulateGameWorld() {
 		}*/
 	}
 
+	this->currentArea = world->GetStartingArea();
 	// Original world generation, no neighbors
 	/*size_t regionNum = rand() % (MAX_REGIONS - MIN_REGIONS) + MIN_REGIONS;
 	for (int i = 0; i < regionNum; i++) {
@@ -238,7 +360,8 @@ string GameWorld::ToString() {
 	return world->DescribeWorld();
 }
 
-void PopulateArea(Area& _area) {
+
+void GameWorld::PopulateArea(Area& _area) {
 	size_t npcInArea = rand() % NPCS_PER_AREA;
 	for (int k = 0; k < npcInArea; k++) {
         
@@ -251,13 +374,68 @@ void PopulateArea(Area& _area) {
 	}
 }
 
-void PopulateRegion(Region& _region, const size_t& _areaNum){
+void GameWorld::PopulateRegion(Region& _region, const size_t& _areaNum){
+	vector<AreaLink> fringe;
+	// create root
+	Area* root = new Area();
+	root->SetNumber(0);
+	root->SetPosition(0,0);
 	for( int i = 0; i < _areaNum; i++) {
 		// Create
-		Area* _newArea = new Area("This is an area.", "Area 0");
-		// Place
-		_region.AddArea(*_newArea);
-		// Populate
+		if(i == 0) {
+			// Root Already created, initialize the AreaLinks
+			for(int i = 0; i < 4; i++) {
+				AreaLink _temp;
+				if (root->GetNeighbor(i) == nullptr) {
+					_temp.parent = root;
+					if (i % 2 == 0) {
+						if (i > 0) {
+							_temp.parentDirection = CompassEnum::West;
+						}
+						else {
+							_temp.parentDirection = CompassEnum::South;
+						}
+					}
+					else {
+						if (i > 1) {
+							_temp.parentDirection = CompassEnum::East;
+						}
+						else {
+							_temp.parentDirection = CompassEnum::North;
+						}
+					}
+					_temp.area = root->GetNeighbor(i);
+
+					fringe.push_back(_temp);
+				}
+			}
+
+			_region.SetRoot(*root);
+			_region.AddArea(*root);
+		}else {
+			AreaLink _tempLink;
+			// rand to determine if DF or BF
+			auto roll = dist(gen)%100;
+			// If roll is less, depth first, if roll is more, breadth first
+			float _df = -5/2*(i)+155/2;
+			float _ratio = (float)i/(float)_areaNum;
+			//std::cout << std::format("Ratio: {}, Ratio*Limit: {}", _ratio, _ratio*31) << std::endl;
+			//std::cout << std::format("Raw Threshold: {}, Ratio Threshold: {}", _df, -5/2*(_ratio*31)+155/2) << std::endl;
+			//std::cout << std::format("Roll: {} vs Threshold: {}", roll, _df) << std::endl;
+			if(roll < _df) {
+				//std::cout << "Popping area off fringe." << std::endl;
+				_tempLink = Pop(fringe);
+			} else {
+				//std::cout << "Dequeuing area off fringe." << std::endl;
+				_tempLink = Dequeue(fringe);
+			}
+			_tempLink = LinkParentAndArea(_tempLink, i);
+
+			PopulateArea(*_tempLink.area);
+			_region.AddArea(*_tempLink.area);
+
+			fringe = AddAreaLinks(fringe, _tempLink);
+		}
 	}
 }
 #pragma endregion

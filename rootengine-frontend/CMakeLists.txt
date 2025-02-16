@@ -1,7 +1,8 @@
 # RootsEngine CMake
-message("[Frontend]")
+message("============ [Frontend] ============")
 add_library(console STATIC "${CMAKE_CURRENT_SOURCE_DIR}/Console/Console.cpp")
 target_include_directories(console PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Console/include/")
+
 
 add_library(entity INTERFACE)
 target_include_directories(entity INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/Entity/include/")
