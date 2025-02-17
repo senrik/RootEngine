@@ -3,11 +3,20 @@
 #include <string>
 enum EntityType {
 	None = 0,
-	Item_Weapon = 1,
-	Item_Armor = 2,
-	Item_Consumable = 3,
-    NPC_Friendly = 4,
-    NPC_Enemy = 5,
+    Player = 1,
+	Item_Weapon = 2,
+	Item_Armor = 3,
+	Item_Consumable = 4,
+    NPC_Friendly = 5,
+    NPC_Enemy = 6,
+};
+
+enum Statistics {
+    None = 4,
+    Health = 0,
+    Attack = 1,
+    Defense = 2,
+    Speed = 3
 };
 
 class Entity {
