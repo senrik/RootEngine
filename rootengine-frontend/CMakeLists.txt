@@ -15,10 +15,14 @@ add_library(npc STATIC "${CMAKE_CURRENT_SOURCE_DIR}/NPC/NPC.cpp")
 target_include_directories(npc PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/NPC/include/")
 target_link_libraries(npc entity item)
 
+add_library(player STATIC "${CMAKE_CURRENT_SOURCE_DIR}/Player/Player.cpp")
+target_include_directories(player PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Player/include/")
+target_link_libraries(player entity item)
+
 add_library(game_world STATIC "${CMAKE_CURRENT_SOURCE_DIR}/GameWorld/GameWorld.cpp")
 target_include_directories(game_world PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/GameWorld/include/")
 target_link_libraries(game_world npc item)
 
 
 add_executable(frontend "${CMAKE_CURRENT_SOURCE_DIR}/frontend_main.cpp")
-target_link_libraries(frontend console game_world)
+target_link_libraries(frontend console game_world player)
