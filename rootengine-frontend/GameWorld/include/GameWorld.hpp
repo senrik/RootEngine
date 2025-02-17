@@ -89,6 +89,7 @@ protected:
 
 class GameWorld {
 public:
+	static string GAME_TITLE;
 	GameWorld();
 	void PopulateGameWorld();
 	void PopulateRegion(Region&, const size_t&);

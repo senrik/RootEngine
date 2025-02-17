@@ -110,6 +110,7 @@ int main(int argc, char* argv[]) {
 	auto _look = new LookFunction(gameWorld, "Describes the current area.");
 	console->AddFunction("look", 0, _look);
 
+	cout<< GameWorld::GAME_TITLE;
 	while(exitCode < 0) {
 		// Display (Start of Update Loop)
 		cout << gameWorld->GetCurrentArea() << endl;
