@@ -86,12 +86,17 @@ std::string NPC::ToString() {
     _output += this->data->attack > 0 ? "|\tAttack:" + std::to_string(this->data->attack) + "\n" : "";
     _output += this->data->defense > 0 ? "|\tDefense:" + std::to_string(this->data->defense) + "\n" : "";
     _output += this->data->speed > 0 ? "|\tSpeed:" + std::to_string(this->data->speed) + "\n" : "";
-    _output += "Loot:\n";
+    
+	std::string _lootOutput = "";
     for(int i = 0; i < 4; i++) {
         if(this->data->rawLoot[i] != nullptr) {
-            _output += this->data->rawLoot[i]->ToString() + "\n";
+            _lootOutput += this->data->rawLoot[i]->ToString() + "\n";
         }
     }
+	if(_lootOutput.length() > 0) {
+		_output += "Loot:\n";
+		_output += _lootOutput;
+	}
     return _output;
 }
 
@@ -149,9 +154,21 @@ void NPC::DeserializeEntity(std::fstream& in) {
 		this->data = reinterpret_cast<NPCData*>(buffer);
 
 		this->label =this->data->label;
+		// populate loot
+		for(int i =0; i < 4; i++) {
+			if(this->data->rawLoot != nullptr) {
+				this->npcLoot.items.push_back((Entity*)this->data->rawLoot[i]);
+			}
+		}
 }
 
 void NPC::SetData(const NPCData& other) {
 	*(this->data) = other;
 	this->label = this->data->label;
+
+	for(int i =0; i < 4; i++) {
+		if(this->data->rawLoot != nullptr) {
+			this->npcLoot.items.push_back((Entity*)this->data->rawLoot[i]);
+		}
+	}
 }
