@@ -4,8 +4,8 @@ add_library(console STATIC "${CMAKE_CURRENT_SOURCE_DIR}/Console/Console.cpp")
 target_include_directories(console PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Console/include/")
 
 
-add_library(entity INTERFACE)
-target_include_directories(entity INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/Entity/include/")
+add_library(entity STATIC "${CMAKE_CURRENT_SOURCE_DIR}/Entity/Entity.cpp")
+target_include_directories(entity PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Entity/include/")
 
 add_library(item STATIC "${CMAKE_CURRENT_SOURCE_DIR}/Item/Item.cpp")
 target_include_directories(item PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Item/include/")

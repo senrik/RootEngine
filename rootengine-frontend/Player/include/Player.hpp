@@ -1,8 +1,16 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 #include <Entity.hpp>
+#include <Item.hpp>
 #include <vector>
 
+
+struct PlayerData : public EntityData {
+    size_t invCount;
+    Item* inventory[8];
+    int stats[4];
+    int currentHealth;
+};
 
 
 // Stats, inventory, actions
@@ -12,12 +20,15 @@ class Player : public Entity {
         Player();
         Player(const Player&);
         ~Player();
-        void GenerateEntity();
-        std::string ToString();
-        
+        void GenerateEntity() override;
+        void SerializeEntity(std::fstream&) override;
+        std::string ToString() override;
+        void Pickup(const Item&);
+        EntityType GetType() override;
+        std::string GetLabel() override;
+        inline int GetID() override { return this->data->id; }
+        void DeserializeEntity(std::fstream&) override;
     private:
-        std::vector<Entity*> inventory;
-        short stats[4];
-
+        PlayerData* data;
 };
 #endif

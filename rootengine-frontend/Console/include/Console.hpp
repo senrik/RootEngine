@@ -51,8 +51,13 @@ class ExitFunction : public ConsoleFunction {
 			code = _code;
 			description = desc;
 		}
-		void operator() (void) {
-			*this->code = 0;
+		void operator() (std::string c = "") {
+			try {
+				*this->code = c.length() > 0 ? std::stoi(c) : 0;
+			} catch (std::exception e) {
+				std::cout << "Provided exit code is invalid: " << c << std::endl;
+			}
+			
 		}
 };
 
@@ -157,7 +162,7 @@ inline void Console<FuncType>::Input(std::istream & _input)
 
 	std::getline(s_stream, _key, ' ');
 
-	if(std::getline(s_stream, _arg, ' ')){
+	if(std::getline(s_stream, _arg, '\n')){
 
 		
 	}

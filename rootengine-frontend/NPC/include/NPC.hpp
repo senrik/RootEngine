@@ -5,15 +5,25 @@
 #include <vector>
 #include <cmath>
 
-class Loot {
-	public:
-		std::vector<Entity*> items;
-		std::string ToString();
+struct Loot {
+	std::vector<Entity*> items;
+	std::string ToString();
+};
+
+struct NPCData : public EntityData {
+	bool hostile;
+	size_t health;
+	size_t attack;
+	size_t defense;
+	size_t speed;
+	std::string responseDialogue;
+	size_t lootCount;
+	Item* rawLoot[4]; 
 };
 
 class NPC : public Entity {
 public:
-    void GenerateLootTable();
+    void GenerateLootTable(std::fstream&, const std::string&);
 	NPC();
 	bool IsHostile();
 	std::string Response();
@@ -21,14 +31,15 @@ public:
 	~NPC();
 	std::string ToString() override;
 	void GenerateEntity() override;
-private:
-	bool hostile;
-	size_t health;
-	size_t attack;
-	size_t defense;
-	size_t speed;
-	std::string responseDialogue;
-	std::string label;
+	void SerializeEntity(std::fstream&) override;
+	EntityType GetType() override;
+	std::string GetLabel() override;
+	void DeserializeEntity(std::fstream&) override;
+	void SetData(const NPCData&);
+	inline int GetID() override { return this->data->id; }
+	NPCData GetData() {return *(this->data);}
+protected:
+	NPCData* data;
 	Loot npcLoot;
 };
 

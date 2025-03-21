@@ -1,30 +1,36 @@
 #include "Item.hpp"
 
 Item::Item() {
-	this->_type = EntityType::None;
-	this->stats.modifiers[Statistics::Health] = 0;
-	this->stats.modifiers[Statistics::Attack] = 0;
-	this->stats.modifiers[Statistics::Defense] = 0;
-	this->stats.modifiers[Statistics::Speed] = 0;
+	this->data = new ItemData();
+	this->data->_type = EntityType::None;
+	this->data->stats.modifiers[Statistics::HealthStat] = 0;
+	this->data->stats.modifiers[Statistics::AttackStat] = 0;
+	this->data->stats.modifiers[Statistics::DefenseStat] = 0;
+	this->data->stats.modifiers[Statistics::SpeedStat] = 0;
 	this->label = "Item";
+	this->rngSeed = std::chrono::high_resolution_clock::now();
 }
 
 
 Item::Item(const EntityType& _type, const StatModifiers& _mods) {
 	this->label = "Item";
-	this->_type = _type;
-	this->stats.modifiers[Statistics::Health] = _mods.modifiers[Statistics::Health];
-	this->stats.modifiers[Statistics::Attack] = _mods.modifiers[Statistics::Attack];
-	this->stats.modifiers[Statistics::Defense] = _mods.modifiers[Statistics::Defense];
-	this->stats.modifiers[Statistics::Speed] = _mods.modifiers[Statistics::Speed];
+	this->data->_type = _type;
+	this->data->stats.modifiers[Statistics::HealthStat] = _mods.modifiers[Statistics::HealthStat];
+	this->data->stats.modifiers[Statistics::AttackStat] = _mods.modifiers[Statistics::AttackStat];
+	this->data->stats.modifiers[Statistics::DefenseStat] = _mods.modifiers[Statistics::DefenseStat];
+	this->data->stats.modifiers[Statistics::SpeedStat] = _mods.modifiers[Statistics::SpeedStat];
+}
+
+Item::~Item() {
+	delete this->data;
 }
 
 StatModifiers Item::Use() {
 	StatModifiers _stats;
-	_stats.modifiers[Statistics::Health] = this->stats.modifiers[Statistics::Health];
-	_stats.modifiers[Statistics::Attack] = this->stats.modifiers[Statistics::Attack];
-	_stats.modifiers[Statistics::Defense] = this->stats.modifiers[Statistics::Defense];
-	_stats.modifiers[Statistics::Speed] = this->stats.modifiers[Statistics::Speed];
+	_stats.modifiers[Statistics::HealthStat] = this->data->stats.modifiers[Statistics::HealthStat];
+	_stats.modifiers[Statistics::AttackStat] = this->data->stats.modifiers[Statistics::AttackStat];
+	_stats.modifiers[Statistics::DefenseStat] = this->data->stats.modifiers[Statistics::DefenseStat];
+	_stats.modifiers[Statistics::SpeedStat] = this->data->stats.modifiers[Statistics::SpeedStat];
 
 	return _stats;
 }
@@ -33,33 +39,106 @@ StatModifiers Item::Use() {
 std::string Item::ToString(){
 	std::string _output = "";
 	_output+= "Name: " +this->label + "\n";
-	switch (this->_type) {
-	case 0:
+	switch (this->data->_type) {
+	case EntityType::None:
 		_output += "|\tType: None\n";
 		break;
-	case 1:
+	case EntityType::Item_Weapon:
 		_output += "|\tType: Weapon\n";
 		break;
-	case 2:
+	case EntityType::Item_Armor:
 		_output += "|\tType: Armor\n";
 		break;
-	case 3:
+	case EntityType::Item_Consumable:
 		_output += "|\tType: Consumable\n";
 		break;
-	}
-	_output += "|\tHealth Modifier: " + std::to_string(this->stats.modifiers[Statistics::Health]) + "\n";
-	_output += "|\tAttack Modifier: " + std::to_string(this->stats.modifiers[Statistics::Attack]) + "\n";
-	_output += "|\tDefense Modifier: " + std::to_string(this->stats.modifiers[Statistics::Defense]) + "\n";
-	_output += "|\tSpeed Modifier: " + std::to_string(this->stats.modifiers[Statistics::Speed]) + "\n";
+	case EntityType::Item_Accessory:
+		_output += "|\tType: Accessory\n";
+		break;
+	}	
+	_output += (this->data->stats.modifiers[Statistics::HealthStat] > 0) ? "|\tHealth Modifier: " + std::to_string(this->data->stats.modifiers[Statistics::HealthStat]) + "\n" : "";
+	_output += (this->data->stats.modifiers[Statistics::AttackStat] > 0) ? "|\tAttack Modifier: " + std::to_string(this->data->stats.modifiers[Statistics::AttackStat]) + "\n" : "";
+	_output += (this->data->stats.modifiers[Statistics::DefenseStat] > 0) ? "|\tDefense Modifier: " + std::to_string(this->data->stats.modifiers[Statistics::DefenseStat]) + "\n" : "";
+	_output += (this->data->stats.modifiers[Statistics::SpeedStat] > 0) ? "|\tSpeed Modifier: " + std::to_string(this->data->stats.modifiers[Statistics::SpeedStat]) + "\n" : "";
 	
 	return _output;
 }
+
+EntityType Item::GetType() {
+	return this->data->_type;
+}
+
+std::string Item::GetLabel() {
+	return this->data->label;
+}
+
+
+
 void Item::GenerateEntity() {
-	int _type = (rand() % (3)) + 1;
+	std::uniform_int_distribution<int> type_dist(2, 5);
+	gen.seed((std::chrono::high_resolution_clock::now() - this->rngSeed).count());
+	int _type = type_dist(gen);
+	this->data->_type = (EntityType)_type;
+
 	StatModifiers _stats;
-	_stats.modifiers[Statistics::Health] = rand() % 20 + 20;
-	_stats.modifiers[Statistics::Attack] = rand() % 5 + 5;
-	_stats.modifiers[Statistics::Defense] = rand() % 5 + 5;
-	_stats.modifiers[Statistics::Speed] = rand() % 5 + 5;
-	this->stats = _stats;
+	std::uniform_int_distribution<int> stat_dist(10, 20);
+	switch(this->data->_type){
+		case EntityType::Item_Weapon:
+			_stats.modifiers[Statistics::HealthStat] = 0;
+			_stats.modifiers[Statistics::AttackStat] = stat_dist(gen);
+			_stats.modifiers[Statistics::DefenseStat] = 0;
+			_stats.modifiers[Statistics::SpeedStat] = 0;
+			this->label = "Sword";
+			break;
+		case EntityType::Item_Armor:
+			_stats.modifiers[Statistics::HealthStat] = 0;
+			_stats.modifiers[Statistics::AttackStat] = 0;
+			_stats.modifiers[Statistics::DefenseStat] = stat_dist(gen);
+			_stats.modifiers[Statistics::SpeedStat] = 0;
+			this->label = "Armor";
+			break;
+		case EntityType::Item_Consumable:
+			_stats.modifiers[Statistics::HealthStat] = stat_dist(gen);
+			_stats.modifiers[Statistics::AttackStat] = 0;
+			_stats.modifiers[Statistics::DefenseStat] = 0;
+			_stats.modifiers[Statistics::SpeedStat] = 0;
+			this->label = "Potion";
+			break;
+		case EntityType::Item_Accessory:
+			_stats.modifiers[Statistics::HealthStat] = 0;
+			_stats.modifiers[Statistics::AttackStat] = 0;
+			_stats.modifiers[Statistics::DefenseStat] = 0;
+			_stats.modifiers[Statistics::SpeedStat] = stat_dist(gen);
+			this->label = "Bangle";
+			break;
+	}
+	this->data->stats = _stats;
+	std::copy(this->label.begin(), this->label.end(), this->data->label);
+	this->data->id = ID;
+	ID++;
+}
+
+void Item::SerializeEntity(std::fstream& out){
+	//TODO
+
+	try {
+		out.write(reinterpret_cast<char*>(this->data), sizeof(ItemData));
+	} catch (std::exception e) {
+		// Silent catch
+	}
+}
+
+void Item::DeserializeEntity(std::fstream& in) {
+	size_t blockSize = sizeof(ItemData);
+
+	char* buffer =  new char[blockSize];
+	in.read(buffer, blockSize);
+
+	this->data = reinterpret_cast<ItemData*>(buffer);
+
+	this->label = this->data->label;
+}
+
+void Item::SetData(const ItemData& other) {
+	*(this->data) = other;
 }

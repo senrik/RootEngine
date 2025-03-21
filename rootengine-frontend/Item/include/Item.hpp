@@ -7,6 +7,10 @@
 struct StatModifiers {
 	unsigned char modifiers[4];
 };
+// Used for serialization of the item
+struct ItemData : public EntityData {
+	StatModifiers stats;
+};
 
 class Item : public Entity{
 public:
@@ -17,9 +21,14 @@ public:
 	StatModifiers Use();
 	void GenerateEntity() override;
     std::string ToString() override;
-
-private:
-	std::string label;
-	StatModifiers stats;
+	void SerializeEntity(std::fstream&) override;
+	EntityType GetType() override;
+	std::string GetLabel() override;
+	void DeserializeEntity(std::fstream&) override;
+	inline int GetID() override { return this->data->id; }
+	void SetData(const ItemData&);
+	ItemData GetData() {return *(this->data);}
+protected:
+	ItemData* data;
 };
 #endif
