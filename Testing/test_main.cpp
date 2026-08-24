@@ -1,14 +1,30 @@
-#include <stdio.h>
+#include <iostream>
 #include <roots_math.h>
-#include <glad/glad.h>
+#include <asset_io.h>
+#include <glad.h>
 #include <GLFW/glfw3.h>
 // C:\Users\sswanson33\Documents\V22 Model\CV22 FBX\cv22_rig01_export06.fbx
 
 
 int main(int argc, char* argv[]) {
 
-	printf_s("Hello, world!");
-	rt_vec2* _vec = (rt_vec2*)malloc(sizeof(rt_vec2));
+	std::cout << "Hello, world!" << std::endl;
+	rt_mat4 identity;
+	mat4_init(&identity, 1);
+	if (!glfwInit()) {
+
+	}
+	auto window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+	if (!window) {
+		//
+		glfwTerminate();
+	}
+	glfwMakeContextCurrent(window);
+	while (!glfwWindowShouldClose(window)) {
+
+	}
+	glfwDestroyWindow(window);
+	glfwTerminate();
 	return 0;
 }
 

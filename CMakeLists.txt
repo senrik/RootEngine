@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 set(CMAKE_CXX_STANDARD 20)
 
 project(roots_engine)
+set(PROJECT_BUILD 1)
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/rootengine-tools/")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/rootengine-renderpipeline/")
