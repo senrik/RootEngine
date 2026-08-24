@@ -44,7 +44,7 @@ class Entity {
     protected:
         static unsigned int ID;
         static std::default_random_engine gen;
-        std::chrono::time_point<std::chrono::system_clock> rngSeed;
+        std::chrono::time_point<std::chrono::steady_clock> rngSeed;
         std::string label;
     private:
         EntityData* data;

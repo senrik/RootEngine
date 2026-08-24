@@ -76,6 +76,7 @@ std::string Item::GetLabel() {
 
 void Item::GenerateEntity() {
 	std::uniform_int_distribution<int> type_dist(2, 5);
+	
 	gen.seed((std::chrono::high_resolution_clock::now() - this->rngSeed).count());
 	int _type = type_dist(gen);
 	this->data->_type = (EntityType)_type;
