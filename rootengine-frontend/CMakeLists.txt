@@ -1,4 +1,12 @@
-# RootsEngine CMake
+# Frontend CMake
+
+if(PROJECT_BUILD)
+	message("[RootEngine Frontend] PROJECT_BUILD set!")
+else()
+	message("[RootEngine Frontend] PROJECT_BUILD not set, making standalone...")
+	cmake_minimum_required(VERSION 3.12)
+	project(rootengine_frontend)
+endif()
 message("============ [Frontend] ============")
 add_library(console STATIC "${CMAKE_CURRENT_SOURCE_DIR}/Console/Console.cpp")
 target_include_directories(console PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Console/include/")
